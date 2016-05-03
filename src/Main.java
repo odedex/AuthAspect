@@ -11,6 +11,8 @@ public class Main {
         counter.Increase();
         counter.Increase();
         counter.Decrease();
+        counter.Decrease();
         System.out.println(counter.Get());
+//        Frame frame = new Frame();
     }
 }
