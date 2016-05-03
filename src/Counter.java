@@ -1,6 +1,8 @@
+
 /**
  * Created by OdedA on 06-Mar-16.
  */
+
 public class Counter {
     int curValue;
 
@@ -8,6 +10,7 @@ public class Counter {
         curValue = 0;
     }
 
+    @MonitorAspect
     public void Increase() {
         curValue++;
     }
