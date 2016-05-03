@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="com.github.scribejava:scribejava-apis:2.5.3" type="repository">
+    <properties maven-id="com.github.scribejava:scribejava-apis:2.5.3" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/scribejava-apis-2.5.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scribejava-core-2.5.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/async-http-client-1.9.36.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/netty-3.10.5.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.12.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/scribejava-apis-2.5.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
