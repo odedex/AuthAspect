@@ -1,16 +1,14 @@
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Created by OdedA on 06-Mar-16.
  */
-public aspect LoggingAspect {
+@Aspect
+public class LoggingAspect {
 //    //test logging pointcut
 //    pointcut publicCalls() : call (public void Increase(..));
 //
@@ -19,29 +17,21 @@ public aspect LoggingAspect {
 //    }
 
 
+//    @Pointcut("execution(public * *(..))")
+//    public void publicMethod() {}
+
+    @Pointcut ("execution(@Logging * *(..))")
+    public void loggingAnnot() {}
+
 //    @Pointcut("execution(* Counter.Increase(..))")
 //    public void counterIncrease() {}
-//
-//    @Before("counterIncrease()")
-//    public void beforeCounterIncrease (JoinPoint joinPoint) {
-//        System.out.println("calling increase Method");
-//    }
 
-
-
-    @Pointcut("execution(@MonitorAspect * *(..))")
-    public void monitored() {}
-
-    @Pointcut("execution(public * *(..))")
-    public void publicMethod() {}
-
-    @Pointcut("monitored() && publicMethod()")
-    public void publicMethodInsideAClassMarkedWithAtMonitor() {}
-
-    @Before("publicMethodInsideAClassMarkedWithAtMonitor()")
-    public void beforeMonitored(JoinPoint joinPoint) {
-        System.out.println("Clicked monitored function.");
+    @Before("loggingAnnot()")
+    public void beforeLoggingAnnot (JoinPoint joinPoint) {
+        System.out.println(joinPoint.toString());
+//        System.out.println("Called Logging annotaion method");
     }
+
 
 //    // log message on every button click
 //    pointcut calcButton() : execution (public void actionPerformed(..));

@@ -120,7 +120,7 @@ public class Frame extends JFrame {
 
     private class EnterButton implements ActionListener {
 
-        @Override
+        @BasicAuth
         public void actionPerformed(ActionEvent e) {
             tempNumbers2 = Double.parseDouble(resultJText.getText());
 
@@ -143,7 +143,6 @@ public class Frame extends JFrame {
 
     private class CButton implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent e) {
             resultJText.setText("");
             tempNumbers1 = 0;
@@ -157,7 +156,6 @@ public class Frame extends JFrame {
 
     private class DivideButton implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());
@@ -173,7 +171,6 @@ public class Frame extends JFrame {
 
     private class MultiplyButton implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());
@@ -191,7 +188,6 @@ public class Frame extends JFrame {
 
     private class AddButton implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());
@@ -207,7 +203,6 @@ public class Frame extends JFrame {
 
     private class SubtractButton implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());

@@ -10,11 +10,12 @@ public class Counter {
         curValue = 0;
     }
 
-    @MonitorAspect
+    @Logging
     public void Increase() {
         curValue++;
     }
 
+    @Logging
     public void Decrease() {
         curValue--;
     }
