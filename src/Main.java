@@ -87,11 +87,11 @@ public class Main {
 
     public static void main(String[] args) {
 //        test();
-        Counter counter = new Counter();
-        counter.Increase();
+//        Counter counter = new Counter();
 //        counter.Increase();
 //        counter.Increase();
-        counter.Decrease();
+//        counter.Increase();
+//        counter.Decrease();
 //        counter.Decrease();
 //        System.out.println(counter.Get());
         Frame frame = new Frame();
