@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.awt.Desktop;
@@ -78,7 +79,7 @@ import javax.swing.SwingUtilities;
 public class BasicAuthAspect {
     private static String htmlString;
     private static ProceedingJoinPoint staticPoint;
-    public static class Browser extends Region {
+    private static class Browser extends Region {
 
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
@@ -95,6 +96,7 @@ public class BasicAuthAspect {
                         public void changed(ObservableValue ov, State oldState, State newState) {
                             if (newState == State.SUCCEEDED) {
 //                                stage.setTitle(webEngine.getLocation());
+                                System.out.println("URL: " + webEngine.getLocation());
                                 Document doc = webEngine.getDocument();
                                 try {
                                     DOMSource domSource = new DOMSource(doc);
@@ -147,7 +149,7 @@ public class BasicAuthAspect {
     }
 
 
-    public static class WebViewSample extends Application {
+    private static class WebViewSample extends Application {
         private Scene scene;
         @Override public void start(Stage stage) {
             // create the scene
@@ -219,6 +221,7 @@ public class BasicAuthAspect {
 //        frame.pack();
 //        frame.setVisible(true);
 
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -236,8 +239,33 @@ public class BasicAuthAspect {
         frame.add(fxPanel);
         frame.setSize(300, 200);
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+//        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+
+//        frame.addWindowListener(new WindowAdapter()
+//        {
+//            public void windowClosing(WindowEvent e)
+//            {
+//                System.out.println("Browser window closed");
+//                frame.dispose();
+//            }
+//        });
+
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+//                if (JOptionPane.showConfirmDialog(frame,
+//                        "Are you sure to close this window?", "Really Closing?",
+//                        JOptionPane.YES_NO_OPTION,
+//                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+//                    System.exit(0);
+//                }
+                System.out.println("Browser window closed");
+                frame.dispose();
+            }
+        });
 
         Platform.runLater(new Runnable() {
             @Override
@@ -301,28 +329,5 @@ public class BasicAuthAspect {
 //        setLocationByPlatform(true);
 //        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //        setVisible(true);
-
-
-
-
-
-
-
-
-//        System.out.println("please enter 'y' to continue");
-//
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//        try {
-//            String s = br.readLine();
-//            if (s.equals("y")) {
-//                try {
-//                    point.proceed();
-//                } catch (Throwable t) {
-//                    System.out.println("caught throwable, refer to BasicAuthAspect");
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.out.println("error");
-//        }
 
 }
