@@ -1,30 +1,15 @@
+import com.github.scribejava.apis.FacebookApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.EventHandler;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.*;
-import javafx.stage.*;
-import javafx.stage.Window;
-import org.aspectj.lang.JoinPoint;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.Button;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.awt.Desktop;
-import java.net.URI;
-
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -37,38 +22,17 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 import javafx.concurrent.Worker.State;
-import org.w3c.dom.Document;
 
-import javax.swing.tree.ExpandVetoException;
-import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -77,16 +41,54 @@ import javax.swing.SwingUtilities;
  */
 @Aspect
 public class BasicAuthAspect {
-    private static String htmlString;
     private static ProceedingJoinPoint staticPoint;
+
+    private static JFrame frame;
+
+    String clientId = "";
+    String clientSecret = "";
+    static String secretState;
+    static OAuth20Service service;
+
+    public static void setKey(String clinetId, String clientSecret){
+
+    }
+
+    public  BasicAuthAspect() throws ClassNotFoundException{
+
+        Class mainclass = Class.forName("Main");
+        Annotation[] annotations = mainclass.getAnnotations();
+
+        for(Annotation annotation : annotations){
+            if(annotation instanceof FacebookCreds){
+                FacebookCreds myAnnotation = (FacebookCreds) annotation;
+                clientId = myAnnotation.clientId();
+                clientSecret = myAnnotation.secret();
+            }
+        }
+
+
+        secretState = "secret" + new Random().nextInt(999_999);
+        service = new ServiceBuilder()
+                .apiKey(clientId)
+                .apiSecret(clientSecret)
+                .state(secretState)
+                .callback("http://www.rotenberg.co.il/oauth_callback/")
+                .build(FacebookApi.instance());
+
+
+    }
+
     private static class Browser extends Region {
 
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
-//        private Stage stage;
 
-        public Browser(/*Stage stageC*/) {
-//            stage = stageC;
+
+
+
+
+        public Browser() {
 
             //apply the styles
             getStyleClass().add("browser");
@@ -95,34 +97,63 @@ public class BasicAuthAspect {
                     new ChangeListener<State>() {
                         public void changed(ObservableValue ov, State oldState, State newState) {
                             if (newState == State.SUCCEEDED) {
-//                                stage.setTitle(webEngine.getLocation());
                                 System.out.println("URL: " + webEngine.getLocation());
-                                Document doc = webEngine.getDocument();
-                                try {
-                                    DOMSource domSource = new DOMSource(doc);
-                                    StringWriter writer = new StringWriter();
-                                    StreamResult result = new StreamResult(writer);
-                                    TransformerFactory tf = TransformerFactory.newInstance();
-                                    Transformer transformer = tf.newTransformer();
-                                    transformer.transform(domSource, result);
-//                                    System.out.println("XML IN String format is: \n" + writer.toString());
-                                    htmlString = writer.toString();
-                                    if (htmlString.length() > 0) {
-                                        System.out.println("html length longer than 0. proceeding");
+                                if (webEngine.getLocation().startsWith("http://www.rotenberg.co.il")){
+                                    String url = webEngine.getLocation();
+                                    Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
+                                    Matcher m = p.matcher(url);
+                                    if (m.find()){
+                                        System.out.println("in if");
+                                        String code = m.group(1);
+                                        String value = m.group(2);
+
+                                        if (secretState.equals(value)) {
+                                            System.out.println("State value does match!");
+                                        } else {
+                                            System.out.println("Ooops, state value does not match!");
+                                            System.out.println("Expected = " + secretState);
+                                            System.out.println("Got      = " + value);
+                                            System.out.println();
+                                        }
+
+                                        // Trade the Request Token and Verfier for the Access Token
+                                        System.out.println("Trading the Request Token for an Access Token...");
+                                        final OAuth2AccessToken accessToken = service.getAccessToken(code);
+
+//                                        private static final String PROTECTED_RESOURCE_URL = "https://graph.facebook.com/v2.5/me";
+
+//                                        // Now let's go and ask for a protected resource!
+//                                        final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL, service);
+//                                        service.signRequest(accessToken, request);
+//                                        final Response response = request.send();
+//                                        System.out.println("Got it! Lets see what we found...");
+//                                        System.out.println();
+//                                        System.out.println(response.getCode());
+//                                        System.out.println(response.getBody());
+
+
                                         try {
+                                            frame.setVisible(false);
                                             staticPoint.proceed();
                                         } catch (Throwable t) {
                                             System.out.println("caught throwable, refer to BasicAuthAspect");
+                                            System.out.println(t);
                                         }
                                     }
-                                } catch (Exception e) {
-                                    System.out.println(e);
+
                                 }
                             }
                         }
                     });
-            webEngine.load("https://www.google.com");
-            //add the web view to the scene
+
+
+
+
+            // Obtain the Authorization URL
+
+            final String authorizationUrl = service.getAuthorizationUrl();
+
+            webEngine.load(authorizationUrl);
             getChildren().add(browser);
 
 
@@ -180,47 +211,6 @@ public class BasicAuthAspect {
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
         staticPoint = point;
 
-//        System.out.println(point.toString());
-//
-//        JFrame frame = new JFrame("FrameDemo");
-//
-////2. Optional: What happens when the frame closes?
-////        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//        JTextField passJText = new JTextField();
-//        passJText.setPreferredSize(new Dimension(160, 20));
-//        passJText.setEnabled(true);
-//        passJText.setHorizontalAlignment(4);
-//
-//        JButton sendButton = new JButton("send");
-//        sendButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                if (passJText.getText().equals("admin")) {
-////                if (true) {
-//                    try {
-//                        frame.setVisible(false);
-//                        frame.dispose();
-//                        point.proceed();
-//                    } catch (Throwable t) {
-//                        System.out.println("caught throwable, refer to BasicAuthAspect");
-//                    }
-//                } else {
-//                    System.out.println("\"" + passJText.getText() + "\"" + " is wrong input");
-//                }
-//            }
-//        });
-//
-//        JPanel myPanel = new JPanel();
-//        myPanel.add(new JLabel("Pass:"));
-//        myPanel.add(passJText);
-//        myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-//        myPanel.add(new JLabel());
-//        myPanel.add(sendButton);
-//
-//        frame.add(myPanel);
-//        frame.pack();
-//        frame.setVisible(true);
-
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -234,12 +224,12 @@ public class BasicAuthAspect {
 
     private static void initAndShowGUI() {
         // This method is invoked on the EDT thread
-        JFrame frame = new JFrame("Swing and JavaFX");
+        frame = new JFrame("Login Using Aspect");
         final JFXPanel fxPanel = new JFXPanel();
         frame.add(fxPanel);
-        frame.setSize(300, 200);
+        frame.setSize(500, 500);
         frame.setVisible(true);
-//        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
@@ -256,14 +246,9 @@ public class BasicAuthAspect {
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-//                if (JOptionPane.showConfirmDialog(frame,
-//                        "Are you sure to close this window?", "Really Closing?",
-//                        JOptionPane.YES_NO_OPTION,
-//                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-//                    System.exit(0);
-//                }
+
                 System.out.println("Browser window closed");
-                frame.dispose();
+                frame.setVisible(false);
             }
         });
 
@@ -282,19 +267,7 @@ public class BasicAuthAspect {
     }
 
     private static Scene createScene() {
-//        Group root  =  new  Group();
-//        Scene scene  =  new  Scene(root, Color.ALICEBLUE);
-//        Text text  =  new  Text();
-//
-//        text.setX(40);
-//        text.setY(100);
-//        text.setFont(new javafx.scene.text.Font(25));
-//        text.setText("Welcome JavaFX!");
-//
-//        root.getChildren().add(text);
-
         Scene scene = new Scene(new Browser(/*stage*/),750,500, Color.web("#666970"));
-//        scene.getStylesheets().add("webviewsample/BrowserToolbar.css");
 
         return (scene);
     }

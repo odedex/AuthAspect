@@ -6,9 +6,11 @@ import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
 
+import java.lang.annotation.Annotation;
 import java.util.Random;
 import java.util.Scanner;
 
+@FacebookCreds(clientId = "497051750494292", secret = "cbb4519a4b8f0a22647150076f12c7e9")
 public class Main {
 
     public static void test(){
@@ -18,7 +20,10 @@ public class Main {
     private static final String NETWORK_NAME = "Facebook";
     private static final String PROTECTED_RESOURCE_URL = "https://graph.facebook.com/v2.5/me";
 
-    public static void facebookConnectionInit() {
+    public static void facebookConnectionInit(){
+
+
+
 
 
         // Replace these with your client id and secret
@@ -84,8 +89,8 @@ public class Main {
 
 
     }
+    public static void main(String[] args) throws ClassNotFoundException {
 
-    public static void main(String[] args) {
 //        test();
 //        Counter counter = new Counter();
 //        counter.Increase();

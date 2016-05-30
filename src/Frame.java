@@ -18,6 +18,8 @@ public class Frame extends JFrame {
 
     public Frame() {
 
+//        BasicAuthAspect.setKey();
+
         JButton[] numberButtons = new JButton[10];
 
         for ( int i = 9; i >= 0; i--) {
