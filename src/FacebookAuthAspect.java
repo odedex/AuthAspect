@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
  * Created by OdedA on 04-May-16.
  */
 @Aspect
-public class FacebookAuthAspect {
+public class FacebookAuthAspect extends BasicAuthAspect {
     private static ProceedingJoinPoint staticPoint;
 
     private static JFrame frame;
@@ -109,37 +109,11 @@ public class FacebookAuthAspect {
                                     Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
                                     Matcher m = p.matcher(url);
                                     if (m.find()){
-                                        System.out.println("in if");
                                         String code = m.group(1);
                                         String value = m.group(2);
-
-                                        if (secretState.equals(value)) {
-                                            System.out.println("State value does match!");
-                                        } else {
-                                            System.out.println("Ooops, state value does not match!");
-                                            System.out.println("Expected = " + secretState);
-                                            System.out.println("Got      = " + value);
-                                            System.out.println();
-                                        }
-
                                         // Trade the Request Token and Verfier for the Access Token
-                                        System.out.println("Trading the Request Token for an Access Token...");
-//                                        final OAuth2AccessToken accessToken = service.getAccessToken(code);
                                         _userToken = service.getAccessToken(code);
                                         _tokenHeld = true;
-
-//                                        private static final String PROTECTED_RESOURCE_URL = "https://graph.facebook.com/v2.5/me";
-
-//                                        // Now let's go and ask for a protected resource!
-//                                        final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL, service);
-//                                        service.signRequest(accessToken, request);
-//                                        final Response response = request.send();
-//                                        System.out.println("Got it! Lets see what we found...");
-//                                        System.out.println();
-//                                        System.out.println(response.getCode());
-//                                        System.out.println(response.getBody());
-
-
                                         try {
                                             frame.setVisible(false);
                                             staticPoint.proceed();
@@ -153,23 +127,10 @@ public class FacebookAuthAspect {
                             }
                         }
                     });
-
-
-
-
             // Obtain the Authorization URL
-
             final String authorizationUrl = service.getAuthorizationUrl();
-
             webEngine.load(authorizationUrl);
             getChildren().add(browser);
-
-
-        }
-        private Node createSpacer() {
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-            return spacer;
         }
 
         @Override protected void layoutChildren() {
@@ -187,43 +148,20 @@ public class FacebookAuthAspect {
         }
     }
 
-
-    private static class WebViewSample extends Application {
-        private Scene scene;
-        @Override public void start(Stage stage) {
-            // create the scene
-            stage.setTitle("Web View");
-            scene = new Scene(new Browser(/*stage*/),750,500, Color.web("#666970"));
-            stage.setScene(scene);
-            scene.getStylesheets().add("webviewsample/BrowserToolbar.css");
-            stage.show();
-        }
-    }
-
     @Pointcut("execution(@FacebookAuth * *(..))")
     public void basicAuthAnnot() {}
 
-//    @Pointcut("execution(public * *(..))")
-//    public void publicMethod() {}
 
-//    @Pointcut("basicAuthAnnot()")
-//    public void publicMethodInsideAClassMarkedWithBasicAuth() {}
-
-//    @Before("publicMethodInsideAClassMarkedWithBasicAuth()")
-//    public void beforeMonitored(JoinPoint joinPoint) {
-//        System.out.println("Clicked basicAuthAnnot function.");
-//    }
-
-    boolean isValid = false;
     @Around("basicAuthAnnot()")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
 
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
+                super.loggedIn(); //TODO: this may be the wrong place
                 point.proceed();
             } catch (Throwable t) {
-                System.out.println("caught throwable, refer to FacebookAuthAspect");
+                System.out.println("caught throwable, refer to FacebookAuthAspect.");
                 System.out.println(t);
             }
         } else {
@@ -248,18 +186,6 @@ public class FacebookAuthAspect {
         frame.setSize(500, 500);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-
-//        frame.addWindowListener(new WindowAdapter()
-//        {
-//            public void windowClosing(WindowEvent e)
-//            {
-//                System.out.println("Browser window closed");
-//                frame.dispose();
-//            }
-//        });
 
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -289,36 +215,4 @@ public class FacebookAuthAspect {
 
         return (scene);
     }
-
-
-
-
-
-
-
-
-        /*##########################################################################*/
-
-
-
-
-//        JPanel motherPanel = new JPanel();
-//        motherPanel.setLayout(new BoxLayout(motherPanel, BoxLayout.Y_AXIS));
-//
-//        JPanel textPanel = new JPanel();
-//        textPanel.setPreferredSize(new Dimension(160, 20));
-//        textPanel.add(resultJText);
-//
-//
-//        motherPanel.add(textPanel);
-//        motherPanel.add(numberButtonsPanel);
-//        motherPanel.add(functionButtonPanel);
-//        add(motherPanel);
-//
-//        setTitle("ButtonTest");
-//        setSize(180, 290);
-//        setLocationByPlatform(true);
-//        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        setVisible(true);
-
 }

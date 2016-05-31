@@ -124,20 +124,26 @@ public class Frame extends JFrame {
 
         @FacebookAuth
         public void actionPerformed(ActionEvent e) {
-            tempNumbers2 = Double.parseDouble(resultJText.getText());
+            try {
+                tempNumbers2 = Double.parseDouble(resultJText.getText());
 
-            if (function == 0) {
-                resultJText.setText(Double.toString((Math.round((tempNumbers1 / tempNumbers2) * 100)) / 100));
-            } else if (function == 1) {
-                resultJText.setText(Double.toString(tempNumbers1 * tempNumbers2));
-            } else if (function == 2) {
-                resultJText.setText(Double.toString(tempNumbers2 + tempNumbers1));
-            } else if (function == 3) {
-                resultJText.setText(Double.toString(tempNumbers1 - tempNumbers2));
-            } else {
-                resultJText.setText(String.valueOf(tempNumbers1));
+                if (function == 0) {
+                    resultJText.setText(Double.toString((Math.round((tempNumbers1 / tempNumbers2) * 100)) / 100));
+                } else if (function == 1) {
+                    resultJText.setText(Double.toString(tempNumbers1 * tempNumbers2));
+                } else if (function == 2) {
+                    resultJText.setText(Double.toString(tempNumbers2 + tempNumbers1));
+                } else if (function == 3) {
+                    resultJText.setText(Double.toString(tempNumbers1 - tempNumbers2));
+                } else {
+                    resultJText.setText(String.valueOf(tempNumbers1));
+                }
+                tempNumbers1 = Double.parseDouble(resultJText.getText());
+            } catch (Exception ex){
+                System.out.println("calculator encountered an error.");
+                System.out.println(ex);
             }
-            tempNumbers1 = Double.parseDouble(resultJText.getText());
+
         }
 
 
