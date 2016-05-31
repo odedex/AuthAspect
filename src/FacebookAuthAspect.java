@@ -29,7 +29,6 @@ import javafx.concurrent.Worker.State;
 
 import java.lang.annotation.Annotation;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,12 +84,13 @@ public class FacebookAuthAspect {
 
     }
 
+    private static OAuth2AccessToken _userToken;
+    private static boolean _tokenHeld = false;
+
     private static class Browser extends Region {
 
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
-
-
 
 
 
@@ -102,7 +102,7 @@ public class FacebookAuthAspect {
             webEngine.getLoadWorker().stateProperty().addListener(
                     new ChangeListener<State>() {
                         public void changed(ObservableValue ov, State oldState, State newState) {
-                            if (newState == State.SUCCEEDED) {
+                            if (newState == State.SUCCEEDED && !_tokenHeld) {
                                 System.out.println("URL: " + webEngine.getLocation());
                                 if (webEngine.getLocation().startsWith("http://www.rotenberg.co.il")){
                                     String url = webEngine.getLocation();
@@ -124,7 +124,9 @@ public class FacebookAuthAspect {
 
                                         // Trade the Request Token and Verfier for the Access Token
                                         System.out.println("Trading the Request Token for an Access Token...");
-                                        final OAuth2AccessToken accessToken = service.getAccessToken(code);
+//                                        final OAuth2AccessToken accessToken = service.getAccessToken(code);
+                                        _userToken = service.getAccessToken(code);
+                                        _tokenHeld = true;
 
 //                                        private static final String PROTECTED_RESOURCE_URL = "https://graph.facebook.com/v2.5/me";
 
@@ -215,15 +217,25 @@ public class FacebookAuthAspect {
     boolean isValid = false;
     @Around("basicAuthAnnot()")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-        staticPoint = point;
 
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                initAndShowGUI();
+        if (_tokenHeld) {
+            try {
+                System.out.println("already logged in");
+                point.proceed();
+            } catch (Throwable t) {
+                System.out.println("caught throwable, refer to FacebookAuthAspect");
+                System.out.println(t);
             }
-        });
+        } else {
+            staticPoint = point;
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    initAndShowGUI();
+                }
+            });
+        }
     }
 
         /*##########################################################################*/
