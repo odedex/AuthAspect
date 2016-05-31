@@ -5,7 +5,9 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -28,6 +30,7 @@ import javafx.scene.Node;
 import javafx.concurrent.Worker.State;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,12 +42,14 @@ import javax.swing.SwingUtilities;
  * Created by OdedA on 31-May-16.
  */
 @Aspect
-public abstract class BasicAuthAspect {
-    public void loggedIn() {
+public class AuthManagerAspect {
 
-    }
+    @Pointcut("execution(* AspectUtils.loggedIn(..))")
+    public void SomeAspectLoggedInInvoke() {}
 
-    public void logIn() {
-
+    @After("SomeAspectLoggedInInvoke()")
+    public void hello(JoinPoint point) {
+        System.out.println("In Auth manager aspect");
+        System.out.println(point.getArgs().toString());
     }
 }

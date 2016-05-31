@@ -29,6 +29,8 @@ import javafx.scene.Node;
 import javafx.concurrent.Worker.State;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +42,8 @@ import javax.swing.SwingUtilities;
  * Created by OdedA on 04-May-16.
  */
 @Aspect
-public class FacebookAuthAspect extends BasicAuthAspect {
+public class FacebookAuthAspect {
+
     private static ProceedingJoinPoint staticPoint;
 
     private static JFrame frame;
@@ -100,7 +103,9 @@ public class FacebookAuthAspect extends BasicAuthAspect {
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
-                super.loggedIn(); //TODO: this may be the wrong place
+                ArrayList<Object> container = new ArrayList<>();
+                container.add(_userToken);
+                AspectUtils.loggedIn(container);
                 point.proceed();
             } catch (Throwable t) {
                 System.out.println("caught throwable, refer to FacebookAuthAspect.");
@@ -170,6 +175,9 @@ public class FacebookAuthAspect extends BasicAuthAspect {
                                                 _tokenHeld = true;
                                                 try {
                                                     frame.setVisible(false);
+                                                    ArrayList<Object> container = new ArrayList<>();
+                                                    container.add(_userToken);
+                                                    AspectUtils.loggedIn(container);
                                                     staticPoint.proceed();
                                                 } catch (Throwable t) {
                                                     System.out.println("caught throwable, refer to FacebookAuthAspect");
