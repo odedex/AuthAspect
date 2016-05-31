@@ -3,6 +3,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -87,66 +88,7 @@ public class FacebookAuthAspect extends BasicAuthAspect {
     private static OAuth2AccessToken _userToken;
     private static boolean _tokenHeld = false;
 
-    private static class Browser extends Region {
 
-        final WebView browser = new WebView();
-        final WebEngine webEngine = browser.getEngine();
-
-
-
-        public Browser() {
-
-            //apply the styles
-            getStyleClass().add("browser");
-            // load the web page
-            webEngine.getLoadWorker().stateProperty().addListener(
-                    new ChangeListener<State>() {
-                        public void changed(ObservableValue ov, State oldState, State newState) {
-                            if (newState == State.SUCCEEDED && !_tokenHeld) {
-                                System.out.println("URL: " + webEngine.getLocation());
-                                if (webEngine.getLocation().startsWith("http://www.rotenberg.co.il")){
-                                    String url = webEngine.getLocation();
-                                    Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
-                                    Matcher m = p.matcher(url);
-                                    if (m.find()){
-                                        String code = m.group(1);
-                                        String value = m.group(2);
-                                        // Trade the Request Token and Verfier for the Access Token
-                                        _userToken = service.getAccessToken(code);
-                                        _tokenHeld = true;
-                                        try {
-                                            frame.setVisible(false);
-                                            staticPoint.proceed();
-                                        } catch (Throwable t) {
-                                            System.out.println("caught throwable, refer to FacebookAuthAspect");
-                                            System.out.println(t);
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-                    });
-            // Obtain the Authorization URL
-            final String authorizationUrl = service.getAuthorizationUrl();
-            webEngine.load(authorizationUrl);
-            getChildren().add(browser);
-        }
-
-        @Override protected void layoutChildren() {
-            double w = getWidth();
-            double h = getHeight();
-            layoutInArea(browser,0,0,w,h,0, HPos.CENTER, VPos.CENTER);
-        }
-
-        @Override protected double computePrefWidth(double height) {
-            return 750;
-        }
-
-        @Override protected double computePrefHeight(double width) {
-            return 500;
-        }
-    }
 
     @Pointcut("execution(@FacebookAuth * *(..))")
     public void basicAuthAnnot() {}
@@ -211,7 +153,39 @@ public class FacebookAuthAspect extends BasicAuthAspect {
     }
 
     private static Scene createScene() {
-        Scene scene = new Scene(new Browser(/*stage*/),750,500, Color.web("#666970"));
+        Browser browser = new Browser();
+        browser.AddListener(new ChangeListener<Worker.State>() {
+                                public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                                    if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
+                                        System.out.println("URL: " + browser.getLocation());
+                                        if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
+                                            String url = browser.getLocation();
+                                            Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
+                                            Matcher m = p.matcher(url);
+                                            if (m.find()) {
+                                                String code = m.group(1);
+                                                String value = m.group(2);
+                                                // Trade the Request Token and Verfier for the Access Token
+                                                _userToken = service.getAccessToken(code);
+                                                _tokenHeld = true;
+                                                try {
+                                                    frame.setVisible(false);
+                                                    staticPoint.proceed();
+                                                } catch (Throwable t) {
+                                                    System.out.println("caught throwable, refer to FacebookAuthAspect");
+                                                    System.out.println(t);
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            });
+
+
+        Scene scene = new Scene(browser,750,500, Color.web("#666970"));
+        final String authorizationUrl = service.getAuthorizationUrl();
+        browser.loadUrl(authorizationUrl);
 
         return (scene);
     }

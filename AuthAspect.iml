@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="aspectjrt" level="project" />
     <orderEntry type="library" name="com.github.scribejava:scribejava-apis:2.5.3" level="project" />
+    <orderEntry type="library" name="com.restfb:restfb:1.23.0" level="project" />
   </component>
 </module>
