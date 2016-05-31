@@ -7,7 +7,5 @@ import java.lang.annotation.Target;
  * Created by OdedA on 03-May-16.
  */
 
-//@Target(ElementType.TYPE)
-//@Retention(RetentionPolicy.SOURCE)
 public @interface FacebookAuth {
 }

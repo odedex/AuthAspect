@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 @FacebookCreds(clientId = "497051750494292", secret = "cbb4519a4b8f0a22647150076f12c7e9")
+@GoogleCreds(clientId = "657134573408-ovnkp7uis8895n4bgh8l2lcmknpvl22b.apps.googleusercontent.com", secret = "rZwECkUSY2uTVZcYlaAu-3xw")
 public class Main {
 
     public static void test(){

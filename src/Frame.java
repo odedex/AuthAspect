@@ -151,6 +151,7 @@ public class Frame extends JFrame {
 
     private class CButton implements ActionListener {
 
+        @GoogleAuth
         public void actionPerformed(ActionEvent e) {
             resultJText.setText("");
             tempNumbers1 = 0;
