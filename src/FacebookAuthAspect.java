@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
  * Created by OdedA on 04-May-16.
  */
 @Aspect
-public class BasicAuthAspect {
+public class FacebookAuthAspect {
     private static ProceedingJoinPoint staticPoint;
 
     private static JFrame frame;
@@ -54,19 +54,25 @@ public class BasicAuthAspect {
 
     }
 
-    public  BasicAuthAspect() throws ClassNotFoundException{
+    public FacebookAuthAspect() throws ClassNotFoundException, Exception{
 
-        Class mainclass = Class.forName("Main");
+        Class mainclass = Class.forName("Main"); //TODO: GENEREALIZE 'Main' TO SOME DEVELOPER DEFINED VALUE.
         Annotation[] annotations = mainclass.getAnnotations();
+        boolean facebookCreds = false;
 
         for(Annotation annotation : annotations){
             if(annotation instanceof FacebookCreds){
                 FacebookCreds myAnnotation = (FacebookCreds) annotation;
                 clientId = myAnnotation.clientId();
                 clientSecret = myAnnotation.secret();
+                facebookCreds = true;
             }
         }
 
+        if (!facebookCreds) {
+            throw new Exception("Facebook credentials were not supplied\nPlease add " +
+                    "@FacebookCreds(clientId = <clientID>, secret = <secret> before the program's main class");
+        }
 
         secretState = "secret" + new Random().nextInt(999_999);
         service = new ServiceBuilder()
@@ -136,7 +142,7 @@ public class BasicAuthAspect {
                                             frame.setVisible(false);
                                             staticPoint.proceed();
                                         } catch (Throwable t) {
-                                            System.out.println("caught throwable, refer to BasicAuthAspect");
+                                            System.out.println("caught throwable, refer to FacebookAuthAspect");
                                             System.out.println(t);
                                         }
                                     }
@@ -192,7 +198,7 @@ public class BasicAuthAspect {
         }
     }
 
-    @Pointcut("execution(@BasicAuth * *(..))")
+    @Pointcut("execution(@FacebookAuth * *(..))")
     public void basicAuthAnnot() {}
 
 //    @Pointcut("execution(public * *(..))")

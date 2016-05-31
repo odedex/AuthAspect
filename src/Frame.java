@@ -18,7 +18,7 @@ public class Frame extends JFrame {
 
     public Frame() {
 
-//        BasicAuthAspect.setKey();
+//        FacebookAuthAspect.setKey();
 
         JButton[] numberButtons = new JButton[10];
 
@@ -122,7 +122,7 @@ public class Frame extends JFrame {
 
     private class EnterButton implements ActionListener {
 
-        @BasicAuth
+        @FacebookAuth
         public void actionPerformed(ActionEvent e) {
             tempNumbers2 = Double.parseDouble(resultJText.getText());
 
