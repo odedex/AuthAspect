@@ -17,6 +17,7 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import javax.swing.*;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
  * Created by Nadav on 31/05/2016.
  */
 @Aspect
-public class GoogleAuthAspect extends BasicAuthAspect {
+public class GoogleAuthAspect{
     private static ProceedingJoinPoint staticPoint;
 
     private static JFrame frame;
@@ -88,7 +89,9 @@ public class GoogleAuthAspect extends BasicAuthAspect {
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
-                super.loggedIn(); //TODO: this may be the wrong place
+                ArrayList<Object> container = new ArrayList<Object>();
+                container.add(_userToken);
+                AspectUtils.loggedIn(container); //TODO: this may be the wrong place
                 point.proceed();
             } catch (Throwable t) {
                 System.out.println("caught throwable, refer to FacebookAuthAspect.");
@@ -165,10 +168,10 @@ public class GoogleAuthAspect extends BasicAuthAspect {
 
                             // Trade the Request Token and Verfier for the Access Token
                             System.out.println("Trading the Request Token for an Access Token...");
-                            OAuth2AccessToken accessToken = service.getAccessToken(code);
+                            _userToken = service.getAccessToken(code);
                             System.out.println("Got the Access Token!");
-                            System.out.println("(if your curious it looks like this: " + accessToken
-                                    + ", 'rawResponse'='" + accessToken.getRawResponse() + "')");
+                            System.out.println("(if your curious it looks like this: " + _userToken
+                                    + ", 'rawResponse'='" + _userToken.getRawResponse() + "')");
 
 //                            System.out.println("Refreshing the Access Token...");
 //                            accessToken = service.refreshAccessToken(accessToken.getRefreshToken());
