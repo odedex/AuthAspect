@@ -148,21 +148,34 @@ public class GoogleAuthAspect extends BasicAuthAspect {
                     System.out.println("URL: " + browser.getLocation());
                     if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
                         String url = browser.getLocation();
-                        Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
+                        Pattern p = Pattern.compile(".+state=(.+)&code=(.+)#.*");
                         Matcher m = p.matcher(url);
                         if (m.find()) {
-                            String code = m.group(1);
-                            String value = m.group(2);
-                            // Trade the Request Token and Verfier for the Access Token
-                            _userToken = service.getAccessToken(code);
-                            _tokenHeld = true;
-                            try {
-                                frame.setVisible(false);
-                                staticPoint.proceed();
-                            } catch (Throwable t) {
-                                System.out.println("caught throwable, refer to FacebookAuthAspect");
-                                System.out.println(t);
+                            String value = m.group(1);
+                            String code = m.group(2);
+
+                            if (secretState.equals(value)) {
+                                System.out.println("State value does match!");
+                            } else {
+                                System.out.println("Ooops, state value does not match!");
+                                System.out.println("Expected = " + secretState);
+                                System.out.println("Got      = " + value);
+                                System.out.println();
                             }
+
+                            // Trade the Request Token and Verfier for the Access Token
+                            System.out.println("Trading the Request Token for an Access Token...");
+                            OAuth2AccessToken accessToken = service.getAccessToken(code);
+                            System.out.println("Got the Access Token!");
+                            System.out.println("(if your curious it looks like this: " + accessToken
+                                    + ", 'rawResponse'='" + accessToken.getRawResponse() + "')");
+
+//                            System.out.println("Refreshing the Access Token...");
+//                            accessToken = service.refreshAccessToken(accessToken.getRefreshToken());
+//                            System.out.println("Refreshed the Access Token!");
+//                            System.out.println("(if your curious it looks like this: " + accessToken
+//                                    + ", 'rawResponse'='" + accessToken.getRawResponse() + "')");
+//                            System.out.println();
                         }
 
                     }
