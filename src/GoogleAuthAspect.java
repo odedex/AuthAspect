@@ -35,6 +35,7 @@ public class GoogleAuthAspect{
 
     String clientId = "";
     String clientSecret = "";
+    String scope = "";
     static String secretState;
     static OAuth20Service service;
 
@@ -54,6 +55,7 @@ public class GoogleAuthAspect{
                 GoogleCreds myAnnotation = (GoogleCreds) annotation;
                 clientId = myAnnotation.clientId();
                 clientSecret = myAnnotation.secret();
+                scope = myAnnotation.scope();
                 googleCreds= true;
             }
         }
@@ -67,7 +69,7 @@ public class GoogleAuthAspect{
         service = new ServiceBuilder()
                 .apiKey(clientId)
                 .apiSecret(clientSecret)
-                .scope("profile") // replace with desired scope
+                .scope(scope) // replace with desired scope
                 .state(secretState)
                 .callback("http://www.rotenberg.co.il/oauth_callback/")
                 .build(GoogleApi20.instance());
@@ -179,6 +181,19 @@ public class GoogleAuthAspect{
 //                            System.out.println("(if your curious it looks like this: " + accessToken
 //                                    + ", 'rawResponse'='" + accessToken.getRawResponse() + "')");
 //                            System.out.println();
+
+
+                            _tokenHeld = true;
+                            try {
+                                frame.setVisible(false);
+                                ArrayList<Object> container = new ArrayList<>();
+                                container.add(_userToken);
+                                AspectUtils.loggedIn(container);
+                                staticPoint.proceed();
+                            } catch (Throwable t) {
+                                System.out.println("caught throwable, refer to FacebookAuthAspect");
+                                System.out.println(t);
+                            }
                         }
 
                     }

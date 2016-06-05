@@ -8,4 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface GoogleCreds {
     String clientId();
     String secret();
+    String scope();
 }

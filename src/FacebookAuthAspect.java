@@ -99,7 +99,7 @@ public class FacebookAuthAspect {
 
     @Around("basicAuthAnnot()")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-
+        System.out.println("facebook in");
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
@@ -121,6 +121,8 @@ public class FacebookAuthAspect {
                 }
             });
         }
+
+        System.out.println("facebook out");
     }
 
         /*##########################################################################*/
