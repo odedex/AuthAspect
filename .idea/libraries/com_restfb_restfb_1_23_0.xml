@@ -4,8 +4,11 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/restfb-1.23.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/lombok-1.16.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/restfb-1.23.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lombok-1.16.6.jar!/" />
     </CLASSES>
     <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/restfb-1.23.0-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/restfb-1.23.0-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />

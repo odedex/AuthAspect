@@ -82,22 +82,25 @@ public class GoogleAuthAspect{
 
 
     @Pointcut("execution(@GoogleAuth * *(..))")
-    public void basicAuthAnnot() {}
+    public void googleAuthAnnotationInvoke() {}
 
 
-    @Around("basicAuthAnnot()")
+    @Around("googleAuthAnnotationInvoke()")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-
+        OAuth2AccessToken authToken = null;
+        if (!_tokenHeld) {
+            authToken = AspectUtils.attemptingLogIn(AuthType.GOOGLE);
+        }
+        if (authToken != null) {
+            _userToken = authToken;
+            _tokenHeld = true;
+        }
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
-                ArrayList<Object> container = new ArrayList<Object>();
-                container.add(_userToken);
-                AspectUtils.loggedIn(container); //TODO: this may be the wrong place
                 point.proceed();
             } catch (Throwable t) {
-                System.out.println("caught throwable, refer to FacebookAuthAspect.");
-                System.out.println(t);
+                System.err.println(t);
             }
         } else {
             staticPoint = point;
@@ -186,9 +189,7 @@ public class GoogleAuthAspect{
                             _tokenHeld = true;
                             try {
                                 frame.setVisible(false);
-                                ArrayList<Object> container = new ArrayList<>();
-                                container.add(_userToken);
-                                AspectUtils.loggedIn(container);
+                                AspectUtils.loggedIn(_userToken, AuthType.GOOGLE);
                                 staticPoint.proceed();
                             } catch (Throwable t) {
                                 System.out.println("caught throwable, refer to FacebookAuthAspect");

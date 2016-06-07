@@ -18,13 +18,13 @@ import java.net.URLEncoder;
 
 import static java.lang.System.out;
 
-public class FacebookFreindList{
+public class FacebookFriendList {
 
     final String MY_APP_ID = "497051750494292";
     final String MY_APP_SECRET = "cbb4519a4b8f0a22647150076f12c7e9";
     final String redirectURL = "http://www.rotenberg.co.il/redirect";
 
-    public FacebookFreindList() {
+    public FacebookFriendList() {
         ScopeBuilder scopeBuilder = new ScopeBuilder();
         scopeBuilder.addPermission(UserDataPermissions.USER_BIRTHDAY);
         scopeBuilder.addPermission(UserDataPermissions.USER_ABOUT_ME);

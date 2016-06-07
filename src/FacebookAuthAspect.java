@@ -38,9 +38,8 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-/**
- * Created by OdedA on 04-May-16.
- */
+
+
 @Aspect
 public class FacebookAuthAspect {
 
@@ -94,22 +93,26 @@ public class FacebookAuthAspect {
 
 
     @Pointcut("execution(@FacebookAuth * *(..))")
-    public void basicAuthAnnot() {}
+    public void facebookAuthAnnotationInvoke() {}
 
 
-    @Around("basicAuthAnnot()")
+    @Around("facebookAuthAnnotationInvoke()")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-        System.out.println("facebook in");
+        OAuth2AccessToken authToken = null;
+        if (!_tokenHeld) {
+            authToken = AspectUtils.attemptingLogIn(AuthType.FACEBOOK);
+        }
+        if (authToken != null) {
+            _userToken = authToken;
+            _tokenHeld = true;
+        }
         if (_tokenHeld) {
             try {
                 System.out.println("already logged in");
-                ArrayList<Object> container = new ArrayList<>();
-                container.add(_userToken);
-                AspectUtils.loggedIn(container);
+//                AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
                 point.proceed();
             } catch (Throwable t) {
-                System.out.println("caught throwable, refer to FacebookAuthAspect.");
-                System.out.println(t);
+                System.err.println(t);
             }
         } else {
             staticPoint = point;
@@ -121,8 +124,6 @@ public class FacebookAuthAspect {
                 }
             });
         }
-
-        System.out.println("facebook out");
     }
 
         /*##########################################################################*/
@@ -177,13 +178,10 @@ public class FacebookAuthAspect {
                                                 _tokenHeld = true;
                                                 try {
                                                     frame.setVisible(false);
-                                                    ArrayList<Object> container = new ArrayList<>();
-                                                    container.add(_userToken);
-                                                    AspectUtils.loggedIn(container);
+                                                    AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
                                                     staticPoint.proceed();
                                                 } catch (Throwable t) {
-                                                    System.out.println("caught throwable, refer to FacebookAuthAspect");
-                                                    System.out.println(t);
+                                                    System.err.println(t);
                                                 }
                                             }
 
