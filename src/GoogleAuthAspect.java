@@ -96,6 +96,7 @@ public class GoogleAuthAspect{
             _tokenHeld = true;
         }
         if (_tokenHeld) {
+            AspectUtils.finishedLogIn();
             try {
                 System.out.println("already logged in");
                 point.proceed();
@@ -129,8 +130,9 @@ public class GoogleAuthAspect{
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 
-                System.out.println("Browser window closed");
+                System.out.println("Browser window closed.");
                 frame.setVisible(false);
+                AspectUtils.finishedLogIn();
             }
         });
 
@@ -162,21 +164,12 @@ public class GoogleAuthAspect{
                             String value = m.group(1);
                             String code = m.group(2);
 
-                            if (secretState.equals(value)) {
-                                System.out.println("State value does match!");
-                            } else {
-                                System.out.println("Ooops, state value does not match!");
-                                System.out.println("Expected = " + secretState);
-                                System.out.println("Got      = " + value);
-                                System.out.println();
-                            }
 
                             // Trade the Request Token and Verfier for the Access Token
-                            System.out.println("Trading the Request Token for an Access Token...");
+//                            System.out.println("Trading the Request Token for an Access Token...");
                             _userToken = service.getAccessToken(code);
-                            System.out.println("Got the Access Token!");
-                            System.out.println("(if your curious it looks like this: " + _userToken
-                                    + ", 'rawResponse'='" + _userToken.getRawResponse() + "')");
+//                            System.out.println("Got the Access Token!");
+//                            System.out.println("(if your curious it looks like this: " + _userToken + ", 'rawResponse'='" + _userToken.getRawResponse() + "')");
 
 //                            System.out.println("Refreshing the Access Token...");
 //                            accessToken = service.refreshAccessToken(accessToken.getRefreshToken());
@@ -190,10 +183,10 @@ public class GoogleAuthAspect{
                             try {
                                 frame.setVisible(false);
                                 AspectUtils.loggedIn(_userToken, AuthType.GOOGLE);
+                                AspectUtils.finishedLogIn();
                                 staticPoint.proceed();
                             } catch (Throwable t) {
-                                System.out.println("caught throwable, refer to FacebookAuthAspect");
-                                System.out.println(t);
+                                System.err.println(t);
                             }
                         }
 

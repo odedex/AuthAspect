@@ -107,6 +107,7 @@ public class FacebookAuthAspect {
             _tokenHeld = true;
         }
         if (_tokenHeld) {
+            AspectUtils.finishedLogIn();
             try {
                 System.out.println("already logged in");
 //                AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
@@ -141,8 +142,9 @@ public class FacebookAuthAspect {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 
-                System.out.println("Browser window closed");
+                System.out.println("Browser window closed.");
                 frame.setVisible(false);
+                AspectUtils.finishedLogIn();
             }
         });
 
@@ -165,7 +167,7 @@ public class FacebookAuthAspect {
         browser.AddListener(new ChangeListener<Worker.State>() {
                                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                                     if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-                                        System.out.println("URL: " + browser.getLocation());
+//                                        System.out.println("URL: " + browser.getLocation());
                                         if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
                                             String url = browser.getLocation();
                                             Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
@@ -179,6 +181,7 @@ public class FacebookAuthAspect {
                                                 try {
                                                     frame.setVisible(false);
                                                     AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
+                                                    AspectUtils.finishedLogIn();
                                                     staticPoint.proceed();
                                                 } catch (Throwable t) {
                                                     System.err.println(t);

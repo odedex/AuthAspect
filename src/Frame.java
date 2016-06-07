@@ -122,7 +122,7 @@ public class Frame extends JFrame {
 
     private class EnterButton implements ActionListener {
 
-
+        @PermanentAuth
         @FacebookAuth
         public void actionPerformed(ActionEvent e) {
             try {
@@ -144,10 +144,7 @@ public class Frame extends JFrame {
                 System.out.println("calculator encountered an error.");
                 System.out.println(ex);
             }
-
         }
-
-
     }
 
     private class CButton implements ActionListener {
@@ -160,12 +157,11 @@ public class Frame extends JFrame {
 
             function = -1;
         }
-
-
     }
 
     private class DivideButton implements ActionListener {
 
+        @PermanentAuth
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());
@@ -176,7 +172,6 @@ public class Frame extends JFrame {
             }
             function = 0;
         }
-
     }
 
     private class MultiplyButton implements ActionListener {
@@ -191,8 +186,6 @@ public class Frame extends JFrame {
             }
             function = 1;
         }
-
-
     }
 
 
@@ -208,7 +201,6 @@ public class Frame extends JFrame {
             }
             function = 2;
         }
-
     }
 
     private class SubtractButton implements ActionListener {

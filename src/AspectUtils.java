@@ -54,6 +54,9 @@ public class AspectUtils {
         return null;
     }
 
+    public static void finishedLogIn() {
+    }
+
     public static boolean writeAuthToFile(String filePrefix, AuthToken authToken) {
         try{
             FileOutputStream fout = new FileOutputStream(filePrefix.concat(tokenFileName));
