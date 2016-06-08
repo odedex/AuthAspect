@@ -13,6 +13,8 @@ public class AspectUtils {
     }
 
     public static OAuth2AccessToken attemptingLogIn(AuthType authType) {
+
+        System.out.println("RETURNING NULL FROM ASPECTUTILS");
         return null;
     }
 

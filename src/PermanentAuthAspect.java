@@ -35,22 +35,23 @@ public class PermanentAuthAspect {
             } catch (Throwable t) {
                 System.err.println(t);
             }
+            System.out.println("returning null from perm auth aspect");
             return null;
         }
         System.out.println("Aspect checking if an available auth is in file");
         AuthType authType = (AuthType)point.getArgs()[0];
         AuthToken authToken = AspectUtils.readAuthFromFile(authType.toString().toLowerCase());
         if (authToken != null) {
-            try {
-                if (authToken.type == authType) {
-                    return authToken.token;
-                } else {
-                    point.proceed();
-                }
-            } catch (Throwable t) {
-                System.err.println(t);
+            if (authToken.type == authType) {
+                System.out.println("found good token!");
+                return authToken.token;
+            } else {
+                System.out.println("token of bad type was read from file");
             }
+        } else {
+            System.out.println("no token read from file");
         }
+        System.out.println("RETURNING NULL FROM PERM AUTH ASPECT");
         return null;
     }
 

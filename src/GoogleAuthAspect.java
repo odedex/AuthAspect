@@ -37,7 +37,6 @@ public class GoogleAuthAspect{
     static String secretState;
     static OAuth20Service service;
 
-
     public static void setKey(String clinetId, String clientSecret){
 
     }
@@ -79,11 +78,7 @@ public class GoogleAuthAspect{
 
 
 
-    @Pointcut("execution(@GoogleAuth * *(..))")
-    public void googleAuthAnnotationInvoke() {}
-
-
-    @Around("googleAuthAnnotationInvoke()")
+    @Around("@annotation(GoogleAuth) && execution(* *(..))")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
         OAuth2AccessToken authToken = null;
         if (!_tokenHeld) {

@@ -7,9 +7,7 @@ import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
@@ -78,15 +76,12 @@ public class FacebookAuthAspect {
 
 
 
-    @Pointcut("execution(@FacebookAuth * *(..))")
-    public void facebookAuthAnnotationInvoke() {}
-
-
-    @Around("facebookAuthAnnotationInvoke()")
+    @Around("@annotation(FacebookAuth) && execution(* *(..))")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
         OAuth2AccessToken authToken = null;
         if (!_tokenHeld) {
             authToken = AspectUtils.attemptingLogIn(AuthType.FACEBOOK);
+            System.out.println(authToken);
         }
         if (authToken != null) {
             _userToken = authToken;

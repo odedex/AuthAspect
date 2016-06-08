@@ -14,9 +14,12 @@ public class OneMinuteAuthAspect {
     private static boolean oneMinActivate;
 
     public OneMinuteAuthAspect() {
-//        System.out.println("=================================");
         System.out.println("in one minute auth ctor");
-//        System.out.println(Thread.currentThread().getStackTrace().toString());
+
+//        System.out.println("=================================");
+//        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+//            System.out.println(ste);
+//        }
 //        System.out.println("=================================");
 
         oneMinActivate = false;
@@ -33,6 +36,7 @@ public class OneMinuteAuthAspect {
             } catch (Throwable t) {
                 System.err.println(t);
             }
+            System.out.println("returning null from one min auth aspect");
             return null;
         }
         System.out.println("Aspect checking if an available auth is in file");
@@ -42,20 +46,16 @@ public class OneMinuteAuthAspect {
             System.out.println("token found on disk. checking if it is no more than 1 minute old");
             Date now = new Date();
             long difference = now.getTime() - authToken.date.getTime();
-            System.out.println(difference);
+            System.out.println(difference / 1000);
             if (difference / 1000 <= 60) {
-                System.out.println("token is no more than 60 seconds old. continueing...");
-                try {
-                    if (authToken.type == authType) {
-                        return authToken.token;
-                    } else {
-                        point.proceed();
-                    }
-                } catch (Throwable t) {
-                    System.err.println(t);
+                System.out.println("token is no more than 60 seconds old. continuing...");
+                if (authToken.type == authType) {
+                    return authToken.token;
                 }
+                System.out.println("token was bad.");
+            } else {
+                System.out.println("token is too old");
             }
-
         }
         return null;
     }
@@ -81,9 +81,14 @@ public class OneMinuteAuthAspect {
     }
 
 
-    @Before("@annotation(OneMinuteAuth) && execution(* *(..))")
+    @Before("@annotation(OneMinAuth) && execution(* *(..))")
     public void initOneMinAuthAspect() {
         System.out.println("one minute auth is now used");
+//        System.out.println("=================================");
+//        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+//            System.out.println(ste);
+//        }
+//        System.out.println("=================================");
         oneMinActivate = true;
     }
 

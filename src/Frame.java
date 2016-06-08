@@ -123,8 +123,9 @@ public class Frame extends JFrame {
 
     private class EnterButton implements ActionListener {
 
-//        @OneMinuteAuth
         @PermanentAuth
+//        @OneMinAuth
+
         @FacebookAuth
         public void actionPerformed(ActionEvent e) {
             try {
