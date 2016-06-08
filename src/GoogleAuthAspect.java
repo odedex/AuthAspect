@@ -1,4 +1,4 @@
-import com.github.scribejava.apis.FacebookApi;
+import Annotations.GoogleCreds;
 import com.github.scribejava.apis.GoogleApi20;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
@@ -17,7 +17,6 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import javax.swing.*;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -81,7 +80,7 @@ public class GoogleAuthAspect{
 
 
 
-    @Pointcut("execution(@GoogleAuth * *(..))")
+    @Pointcut("execution(@Annotations.GoogleAuth * *(..))")
     public void googleAuthAnnotationInvoke() {}
 
 

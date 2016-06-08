@@ -7,7 +7,7 @@ public enum AuthType {
 
     private String name;
 
-    private AuthType(String val) {
+    AuthType(String val) {
         this.name = val;
     }
 

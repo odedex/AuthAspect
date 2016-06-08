@@ -11,27 +11,38 @@ import org.aspectj.lang.annotation.*;
 @Aspect
 public class PermanentAuthAspect {
 
+    private static boolean permActivate;
 
-    private static boolean activate = false;
+
+    public PermanentAuthAspect() {
+//        System.out.println("=================================");
+        System.out.println("in perm auth ctor");
+//        System.out.println(Thread.currentThread().getStackTrace().toString());
+//        System.out.println("=================================");
+
+        permActivate = false;
+    }
+
 
     @Pointcut("execution(* AspectUtils.attemptingLogIn(..))")
-    public void SomeAspectAttemptingToLogInInvoke() {}
+    public void PermAuthSomeAspectAttemptingToLogInInvoke() {}
 
-    @Around("SomeAspectAttemptingToLogInInvoke()")
+    @Around("PermAuthSomeAspectAttemptingToLogInInvoke()")
     public OAuth2AccessToken getPermAuthFromDisk(ProceedingJoinPoint point) {
-        if (!activate) {
+        if (!permActivate) {
             try {
                 point.proceed();
             } catch (Throwable t) {
                 System.err.println(t);
             }
+            return null;
         }
         System.out.println("Aspect checking if an available auth is in file");
         AuthType authType = (AuthType)point.getArgs()[0];
         AuthToken authToken = AspectUtils.readAuthFromFile(authType.toString().toLowerCase());
         if (authToken != null) {
             try {
-                if (authToken.type == AuthType.FACEBOOK) {
+                if (authToken.type == authType) {
                     return authToken.token;
                 } else {
                     point.proceed();
@@ -44,11 +55,11 @@ public class PermanentAuthAspect {
     }
 
     @Pointcut("execution(* AspectUtils.loggedIn(..))")
-    public void SomeAspectLoggedInInvoke() {}
+    public void PermAuthSomeAspectLoggedInInvoke() {}
 
-    @After("SomeAspectLoggedInInvoke()")
+    @After("PermAuthSomeAspectLoggedInInvoke()")
     public void savePermAuthToDisk(JoinPoint point) {
-        if (!activate) {
+        if (!permActivate) {
             return;
         }
         System.out.println("In permanent Auth manager aspect. about to save auth token to disk.");
@@ -60,26 +71,27 @@ public class PermanentAuthAspect {
         } else {
             System.out.println("auth token saved successfully on disk");
         }
+
     }
 
 
-    @Pointcut("execution(@PermanentAuth * *(..))")
-    public void PermanentAuthAnnotationInvoke() {}
+    @Pointcut("execution(@Annotations.PermanentAuth * *(..))")
+    public void PermAuthAnnotationInvoke() {}
 
-    @Before("PermanentAuthAnnotationInvoke()")
-    public void initPermanentAuthAspect() {
+    @Before("PermAuthAnnotationInvoke()")
+    public void initPermAuthAspect() {
         System.out.println("perm auth is now used");
-        activate = true;
+        permActivate = true;
     }
 
     @Pointcut("execution(* AspectUtils.finishedLogIn(..))")
-    public void SomeAspectFinishedLoggingInInvoke() {}
+    public void PermAuthSomeAspectFinishedLoggingInInvoke() {}
 
-    @After("SomeAspectFinishedLoggingInInvoke()")
-    public void finishPermanentAuthAspect() {
-        if (activate) {
+    @After("PermAuthSomeAspectFinishedLoggingInInvoke()")
+    public void finishPermAuthAspect() {
+        if (permActivate) {
             System.out.println("perm auth is no longer used");
-            activate = false;
+            permActivate = false;
         }
     }
 

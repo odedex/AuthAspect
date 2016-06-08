@@ -1,12 +1,17 @@
+package Annotations;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by Nadav on 31/05/2016.
+ * Created by OdedA on 30-May-16.
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GoogleCreds {
+public @interface FacebookCreds  {
     String clientId();
     String secret();
-    String scope();
 }
+
+
+
+

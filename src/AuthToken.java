@@ -11,7 +11,7 @@ public class AuthToken implements Serializable {
     public AuthType type;
     public Date date;
 
-    public AuthToken(OAuth2AccessToken tok,AuthType auth) {
+    public AuthToken(OAuth2AccessToken tok, AuthType auth) {
         this.token = tok;
         this.type = auth;
         this.date = new Date();

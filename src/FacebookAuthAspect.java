@@ -1,3 +1,4 @@
+import Annotations.FacebookCreds;
 import com.github.scribejava.apis.FacebookApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
@@ -11,26 +12,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
-import javafx.application.Application;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.Node;
-import javafx.concurrent.Worker.State;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +41,6 @@ public class FacebookAuthAspect {
     static OAuth20Service service;
 
     public static void setKey(String clinetId, String clientSecret){
-
     }
 
     public FacebookAuthAspect() throws ClassNotFoundException, Exception{
@@ -73,7 +60,7 @@ public class FacebookAuthAspect {
 
         if (!facebookCreds) {
             throw new Exception("Facebook credentials were not supplied\nPlease add " +
-                    "@FacebookCreds(clientId = <clientID>, secret = <secret> before the program's main class");
+                    "@Annotations.FacebookCreds(clientId = <clientID>, secret = <secret> before the program's main class");
         }
 
         secretState = "secret" + new Random().nextInt(999_999);
@@ -92,7 +79,7 @@ public class FacebookAuthAspect {
 
 
 
-    @Pointcut("execution(@FacebookAuth * *(..))")
+    @Pointcut("execution(@Annotations.FacebookAuth * *(..))")
     public void facebookAuthAnnotationInvoke() {}
 
 
@@ -129,6 +116,7 @@ public class FacebookAuthAspect {
 
         /*##########################################################################*/
 
+
     private static void initAndShowGUI() {
         // This method is invoked on the EDT thread
         frame = new JFrame("Login Using Aspect");
@@ -155,6 +143,7 @@ public class FacebookAuthAspect {
             }
         });
     }
+
 
     private static void initFX(JFXPanel fxPanel) {
         // This method is invoked on the JavaFX thread

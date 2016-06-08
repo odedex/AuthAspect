@@ -1,6 +1,12 @@
 /**
  * Created by OdedA on 03-May-16.
  */
+
+import Annotations.FacebookAuth;
+import Annotations.GoogleAuth;
+import Annotations.OneMinuteAuth;
+import Annotations.PermanentAuth;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -161,7 +167,6 @@ public class Frame extends JFrame {
 
     private class DivideButton implements ActionListener {
 
-        @PermanentAuth
         public void actionPerformed(ActionEvent e) {
             if (tempNumbers1 == 0) {
                 tempNumbers1 = Double.parseDouble(resultJText.getText());
