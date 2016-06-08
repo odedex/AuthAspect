@@ -24,8 +24,10 @@ public class PermanentAuthAspect {
     }
 
 
-    @Pointcut("execution(* AspectUtils.attemptingLogIn(..))")
-    public void PermAuthSomeAspectAttemptingToLogInInvoke() {}
+    @Pointcut("execution(* AspectUtils.attemptingLogIn(..)) && if()")
+    public static boolean PermAuthSomeAspectAttemptingToLogInInvoke() {
+        return permActivate;
+    }
 
     @Around("PermAuthSomeAspectAttemptingToLogInInvoke()")
     public OAuth2AccessToken getPermAuthFromDisk(ProceedingJoinPoint point) {
@@ -55,8 +57,10 @@ public class PermanentAuthAspect {
         return null;
     }
 
-    @Pointcut("execution(* AspectUtils.loggedIn(..))")
-    public void PermAuthSomeAspectLoggedInInvoke() {}
+    @Pointcut("execution(* AspectUtils.loggedIn(..)) && if()")
+    public static boolean PermAuthSomeAspectLoggedInInvoke() {
+        return permActivate;
+    }
 
     @After("PermAuthSomeAspectLoggedInInvoke()")
     public void savePermAuthToDisk(JoinPoint point) {

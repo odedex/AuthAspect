@@ -81,7 +81,7 @@ public class FacebookAuthAspect {
         OAuth2AccessToken authToken = null;
         if (!_tokenHeld) {
             authToken = AspectUtils.attemptingLogIn(AuthType.FACEBOOK);
-            System.out.println(authToken);
+//            System.out.println(authToken);
         }
         if (authToken != null) {
             _userToken = authToken;

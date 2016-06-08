@@ -25,8 +25,10 @@ public class OneMinuteAuthAspect {
         oneMinActivate = false;
     }
 
-    @Pointcut("execution(* AspectUtils.attemptingLogIn(..))")
-    public void OneMinAuthSomeAspectAttemptingToLogInInvoke() {}
+    @Pointcut("execution(* AspectUtils.attemptingLogIn(..)) && if()")
+    public static boolean OneMinAuthSomeAspectAttemptingToLogInInvoke() {
+        return oneMinActivate;
+    }
 
     @Around("OneMinAuthSomeAspectAttemptingToLogInInvoke()")
     public OAuth2AccessToken getOneMinAuthFromDisk(ProceedingJoinPoint point) {
@@ -60,8 +62,10 @@ public class OneMinuteAuthAspect {
         return null;
     }
 
-    @Pointcut("execution(* AspectUtils.loggedIn(..))")
-    public void OneMinAuthSomeAspectLoggedInInvoke() {}
+    @Pointcut("execution(* AspectUtils.loggedIn(..)) && if()")
+    public static boolean OneMinAuthSomeAspectLoggedInInvoke() {
+        return oneMinActivate;
+    }
 
     @After("OneMinAuthSomeAspectLoggedInInvoke()")
     public void saveOneMinAuthToDisk(JoinPoint point) {
