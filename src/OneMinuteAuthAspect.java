@@ -81,10 +81,7 @@ public class OneMinuteAuthAspect {
     }
 
 
-    @Pointcut("execution(@OneMinuteAuth * *(..))")
-    public void OneMinAuthAnnotationInvoke() {}
-
-    @Before("OneMinAuthAnnotationInvoke()")
+    @Before("@annotation(OneMinuteAuth) && execution(* *(..))")
     public void initOneMinAuthAspect() {
         System.out.println("one minute auth is now used");
         oneMinActivate = true;
@@ -93,7 +90,7 @@ public class OneMinuteAuthAspect {
     @Pointcut("execution(* AspectUtils.finishedLogIn(..))")
     public void OneMinAuthSomeAspectFinishedLoggingInInvoke() {}
 
-    @After("OneMinAuthSomeAspectFinishedLoggingInInvoke()")
+    @Before("OneMinAuthSomeAspectFinishedLoggingInInvoke()")
     public void finishOneMinAuthAspect() {
         if (oneMinActivate) {
             System.out.println("one minute auth is no longer used");

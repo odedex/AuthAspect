@@ -74,11 +74,7 @@ public class PermanentAuthAspect {
 
     }
 
-
-    @Pointcut("execution(@PermanentAuth * *(..))")
-    public void PermAuthAnnotationInvoke() {}
-
-    @Before("PermAuthAnnotationInvoke()")
+    @Before("@annotation(PermanentAuth) && execution(* *(..))")
     public void initPermAuthAspect() {
         System.out.println("perm auth is now used");
         permActivate = true;
