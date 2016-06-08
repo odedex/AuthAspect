@@ -2,11 +2,6 @@
  * Created by OdedA on 03-May-16.
  */
 
-import Annotations.FacebookAuth;
-import Annotations.GoogleAuth;
-import Annotations.OneMinuteAuth;
-import Annotations.PermanentAuth;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

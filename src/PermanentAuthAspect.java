@@ -75,7 +75,7 @@ public class PermanentAuthAspect {
     }
 
 
-    @Pointcut("execution(@Annotations.PermanentAuth * *(..))")
+    @Pointcut("execution(@PermanentAuth * *(..))")
     public void PermAuthAnnotationInvoke() {}
 
     @Before("PermAuthAnnotationInvoke()")

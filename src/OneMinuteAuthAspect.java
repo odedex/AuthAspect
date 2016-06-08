@@ -81,7 +81,7 @@ public class OneMinuteAuthAspect {
     }
 
 
-    @Pointcut("execution(@Annotations.OneMinuteAuth * *(..))")
+    @Pointcut("execution(@OneMinuteAuth * *(..))")
     public void OneMinAuthAnnotationInvoke() {}
 
     @Before("OneMinAuthAnnotationInvoke()")

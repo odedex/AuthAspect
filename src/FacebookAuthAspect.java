@@ -1,4 +1,3 @@
-import Annotations.FacebookCreds;
 import com.github.scribejava.apis.FacebookApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
@@ -60,7 +59,7 @@ public class FacebookAuthAspect {
 
         if (!facebookCreds) {
             throw new Exception("Facebook credentials were not supplied\nPlease add " +
-                    "@Annotations.FacebookCreds(clientId = <clientID>, secret = <secret> before the program's main class");
+                    "@FacebookCreds(clientId = <clientID>, secret = <secret> before the program's main class");
         }
 
         secretState = "secret" + new Random().nextInt(999_999);
@@ -79,7 +78,7 @@ public class FacebookAuthAspect {
 
 
 
-    @Pointcut("execution(@Annotations.FacebookAuth * *(..))")
+    @Pointcut("execution(@FacebookAuth * *(..))")
     public void facebookAuthAnnotationInvoke() {}
 
 

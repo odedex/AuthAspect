@@ -17,6 +17,7 @@ public class AspectUtils {
     }
 
     public static void finishedLogIn() {
+        System.out.println("an attempt to log in has ended");
     }
 
     public static boolean writeAuthToFile(String filePrefix, AuthToken authToken) {
