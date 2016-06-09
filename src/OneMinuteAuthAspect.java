@@ -1,6 +1,7 @@
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 
 import java.util.Date;
@@ -61,6 +62,20 @@ public class OneMinuteAuthAspect {
         }
         return null;
     }
+
+//    @Pointcut ("execution(public static void main(String[]))")
+//    public void psvminvoke(){}
+//
+//    @Before("psvminvoke()")
+//    public void psvminvokeadvice(JoinPoint point) {
+//
+//        String psvmSignature = point.getStaticPart().getSignature().toString();
+//        String[] psvmSigArrayByDots = psvmSignature.split("\\.");
+//        String callingClass = psvmSigArrayByDots[psvmSigArrayByDots.length - 2];
+//        String[] callingClassArrayBySpaces = callingClass.split(" ");
+//        String classname = callingClassArrayBySpaces[callingClassArrayBySpaces.length - 1];
+//    }
+
 
     @Pointcut("execution(* AspectUtils.loggedIn(..)) && if()")
     public static boolean OneMinAuthSomeAspectLoggedInInvoke() {

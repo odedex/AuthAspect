@@ -43,11 +43,9 @@ public class GoogleAuthAspect{
 
     public GoogleAuthAspect() throws ClassNotFoundException, Exception{
 
-        Class mainclass = Class.forName("Main"); //TODO: GENEREALIZE 'Main' TO SOME DEVELOPER DEFINED VALUE.
-        Annotation[] annotations = mainclass.getAnnotations();
         boolean googleCreds = false;
 
-        for(Annotation annotation : annotations){
+        for(Annotation annotation : CredentialsAspect.annotations){
             if(annotation instanceof GoogleCreds){
                 GoogleCreds myAnnotation = (GoogleCreds) annotation;
                 clientId = myAnnotation.clientId();

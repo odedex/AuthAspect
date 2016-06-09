@@ -37,6 +37,7 @@ public class AspectUtils{
 
     public static boolean writeAuthToFile(String filePrefix, AuthToken authToken) {
         try{
+
             FileOutputStream fout = new FileOutputStream(filePrefix.concat(tokenFileName));
             ObjectOutputStream oos = new ObjectOutputStream(fout);
             oos.writeObject(authToken);
@@ -45,7 +46,7 @@ public class AspectUtils{
             return true;
 
         } catch(Exception ex) {
-            System.out.println("FAILED TO WRITE AUTH TOKEN TO FAIL!");
+            System.out.println("FAILED TO WRITE AUTH TOKEN TO FILE!");
             ex.printStackTrace();
             return false;
         }
@@ -58,6 +59,7 @@ public class AspectUtils{
             return null;
         }
         try{
+
             FileInputStream fin = new FileInputStream(filePrefix.concat(tokenFileName));
             ObjectInputStream ois = new ObjectInputStream(fin);
             AuthToken token = (AuthToken) ois.readObject();

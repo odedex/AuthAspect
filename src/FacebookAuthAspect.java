@@ -43,12 +43,10 @@ public class FacebookAuthAspect {
 
     public FacebookAuthAspect() throws ClassNotFoundException, Exception{
 
-        Class mainclass = Class.forName("Main"); //TODO: GENEREALIZE 'Main' TO SOME DEVELOPER DEFINED VALUE.
-        Annotation[] annotations = mainclass.getAnnotations();
         boolean facebookCreds = false;
         String scope = "";
 
-        for(Annotation annotation : annotations){
+        for(Annotation annotation : CredentialsAspect.annotations){
             if(annotation instanceof FacebookCreds){
                 FacebookCreds myAnnotation = (FacebookCreds) annotation;
                 clientId = myAnnotation.clientId();
