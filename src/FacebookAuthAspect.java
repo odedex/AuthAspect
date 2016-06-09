@@ -40,20 +40,20 @@ public class FacebookAuthAspect {
     static String secretState;
     static OAuth20Service service;
 
-    public static void setKey(String clinetId, String clientSecret){
-    }
 
     public FacebookAuthAspect() throws ClassNotFoundException, Exception{
 
         Class mainclass = Class.forName("Main"); //TODO: GENEREALIZE 'Main' TO SOME DEVELOPER DEFINED VALUE.
         Annotation[] annotations = mainclass.getAnnotations();
         boolean facebookCreds = false;
+        String scope = "";
 
         for(Annotation annotation : annotations){
             if(annotation instanceof FacebookCreds){
                 FacebookCreds myAnnotation = (FacebookCreds) annotation;
                 clientId = myAnnotation.clientId();
                 clientSecret = myAnnotation.secret();
+                scope = myAnnotation.scope();
                 facebookCreds = true;
             }
         }
@@ -68,6 +68,7 @@ public class FacebookAuthAspect {
                 .apiKey(clientId)
                 .apiSecret(clientSecret)
                 .state(secretState)
+                .scope(scope)
                 .callback("http://www.rotenberg.co.il/oauth_callback/")
                 .build(FacebookApi.instance());
 

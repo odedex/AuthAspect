@@ -8,6 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface FacebookCreds  {
     String clientId();
     String secret();
+    String scope();
 }
 
 
