@@ -1,15 +1,28 @@
 import com.github.scribejava.core.model.OAuth2AccessToken;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by OdedA on 31-May-16.
  */
-public class AspectUtils {
+public class AspectUtils{
+
+    private static Map authKeys = new HashMap();
+
+    public static OAuth2AccessToken getToken(AuthType type){
+        if (authKeys.containsKey(type)){
+            return (OAuth2AccessToken) authKeys.get(type);
+        }
+        return null;
+    }
+
 
     private static String tokenFileName = "authToken";
 
     public static void loggedIn(OAuth2AccessToken token, AuthType authType) {
+        authKeys.put(authType, token);
     }
 
     public static OAuth2AccessToken attemptingLogIn(AuthType authType) {

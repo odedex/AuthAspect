@@ -1,11 +1,17 @@
 /**
  * Created by OdedA on 03-May-16.
  */
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.OAuthRequest;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.aspectj.lang.annotation.Aspect;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Frame extends JFrame {
 
@@ -33,6 +39,7 @@ public class Frame extends JFrame {
         JButton divideButton    = new JButton("/");
         JButton addButton       = new JButton("+");
         JButton substractButton = new JButton("-");
+        JButton fbButton = new JButton("fb");
 
 
         resultJText = new JTextField();
@@ -57,14 +64,18 @@ public class Frame extends JFrame {
             numberButtonsPanel.add(numberButtons[i]);
         }
 
+        numberButtonsPanel.add(fbButton);
+
         JPanel functionButtonPanel = new JPanel();
         functionButtonPanel.setPreferredSize(new Dimension(160, 35));
         functionButtonPanel.add(enterButton);
         functionButtonPanel.add(cButton);
         functionButtonPanel.add(multiplyButton);
+
         functionButtonPanel.add(divideButton);
         functionButtonPanel.add(addButton);
         functionButtonPanel.add(substractButton);
+
 
         numberButtonsAction[] numberButtonActions = new numberButtonsAction[10];
         for ( int i = 0; i < 10; i++ ) {
@@ -81,6 +92,9 @@ public class Frame extends JFrame {
         MultiplyButton multiply = new MultiplyButton();
         multiplyButton.addActionListener(multiply);
 
+        FBButton fbClickButton = new FBButton();
+        fbButton.addActionListener(fbClickButton);
+
         DivideButton divide = new DivideButton();
         divideButton.addActionListener(divide);
 
@@ -89,6 +103,8 @@ public class Frame extends JFrame {
 
         SubtractButton subtract = new SubtractButton();
         substractButton.addActionListener(subtract);
+
+
 
         motherPanel.add(textPanel);
         motherPanel.add(numberButtonsPanel);
@@ -125,7 +141,6 @@ public class Frame extends JFrame {
 
 //        @PermanentAuth
         @OneMinAuth
-
         @FacebookAuth
         public void actionPerformed(ActionEvent e) {
             try {
@@ -147,11 +162,15 @@ public class Frame extends JFrame {
                 System.out.println("calculator encountered an error.");
                 System.out.println(ex);
             }
+
         }
+
+
     }
 
     private class CButton implements ActionListener {
 
+        @PermanentAuth
         @GoogleAuth
         public void actionPerformed(ActionEvent e) {
             resultJText.setText("");
@@ -159,6 +178,42 @@ public class Frame extends JFrame {
             tempNumbers2 = 0;
 
             function = -1;
+        }
+    }
+
+    private class FBButton implements ActionListener {
+
+
+        @PermanentAuth
+        @FacebookAuth
+        public void actionPerformed(ActionEvent e) {
+
+            String data = getNumOfFriends();
+            System.out.println(data);
+            //.+"total_count":(\d+).*
+
+            Pattern p = Pattern.compile(".+\"total_count\":(\\d+).*");
+            Matcher m = p.matcher(data);
+            if (m.find()) {
+                System.out.println("matched");
+                int friends = Integer.parseInt(m.group(1));
+//                resultJText.setText(m.group(1));
+                if (!resultJText.getText().equals("0.0")) {
+                    resultJText.setText(resultJText.getText() + m.group(1));
+                } else {
+                    resultJText.setText("");
+                    actionPerformed(e);
+                }
+
+            }
+
+
+        }
+
+
+        @FacebookPrivateResource(url = "https://graph.facebook.com/v2.6/me/friends")
+        private String getNumOfFriends(){
+            return "";
         }
     }
 
@@ -174,6 +229,7 @@ public class Frame extends JFrame {
             }
             function = 0;
         }
+
     }
 
     private class MultiplyButton implements ActionListener {
@@ -188,6 +244,8 @@ public class Frame extends JFrame {
             }
             function = 1;
         }
+
+
     }
 
 
@@ -203,6 +261,7 @@ public class Frame extends JFrame {
             }
             function = 2;
         }
+
     }
 
     private class SubtractButton implements ActionListener {

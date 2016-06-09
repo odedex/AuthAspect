@@ -1,6 +1,9 @@
 import com.github.scribejava.apis.FacebookApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.model.Response;
+import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
@@ -107,6 +110,25 @@ public class FacebookAuthAspect {
             });
         }
     }
+
+    @Pointcut(value="@annotation(FacebookPrivateResource)")
+    protected void getPrvateResource(FacebookPrivateResource FacebookPrivateResource) {
+    }
+
+    @Around("getPrvateResource(FacebookPrivateResource)")
+    public String dowork(FacebookPrivateResource FacebookPrivateResource){
+        final OAuthRequest request = new OAuthRequest(Verb.GET, FacebookPrivateResource.url(), service);
+        service.signRequest(_userToken, request);
+        final Response response = request.send();
+        System.out.println("Got it! Lets see what we found...");
+        System.out.println();
+        System.out.println(response.getCode());
+        System.out.println(response.getBody());
+        return response.getBody();
+
+    }
+
+
 
         /*##########################################################################*/
 
