@@ -92,7 +92,7 @@ public class FacebookAuthAspect {
         if (_tokenHeld) {
             AspectUtils.finishedLogIn();
             try {
-                System.out.println("already logged in");
+//                System.out.println("already logged in");
 //                AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
                 point.proceed();
             } catch (Throwable t) {
@@ -119,10 +119,10 @@ public class FacebookAuthAspect {
         final OAuthRequest request = new OAuthRequest(Verb.GET, FacebookPrivateResource.url(), service);
         service.signRequest(_userToken, request);
         final Response response = request.send();
-        System.out.println("Got it! Lets see what we found...");
-        System.out.println();
-        System.out.println(response.getCode());
-        System.out.println(response.getBody());
+//        System.out.println("Got it! Lets see what we found...");
+//        System.out.println();
+//        System.out.println(response.getCode());
+//        System.out.println(response.getBody());
         return response.getBody();
 
     }

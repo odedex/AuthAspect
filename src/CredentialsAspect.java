@@ -32,7 +32,7 @@ public class CredentialsAspect {
             Class mainclass = Class.forName(classname);
             annotations = mainclass.getAnnotations();
 
-            System.out.println("got all credential annotations!");
+//            System.out.println("got all credential annotations!");
         } catch (ClassNotFoundException cnfe) {
             System.err.println(cnfe);
             System.out.println("could not locate main class for program");

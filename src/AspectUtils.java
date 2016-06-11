@@ -27,12 +27,12 @@ public class AspectUtils{
 
     public static OAuth2AccessToken attemptingLogIn(AuthType authType) {
 
-        System.out.println("RETURNING NULL FROM ASPECTUTILS");
+//        System.out.println("RETURNING NULL FROM ASPECTUTILS");
         return null;
     }
 
     public static void finishedLogIn() {
-        System.out.println("an attempt to log in has ended");
+//        System.out.println("an attempt to log in has ended");
     }
 
     public static boolean writeAuthToFile(String filePrefix, AuthToken authToken) {
@@ -42,7 +42,7 @@ public class AspectUtils{
             ObjectOutputStream oos = new ObjectOutputStream(fout);
             oos.writeObject(authToken);
             oos.close();
-            System.out.println("Done writing");
+            System.out.println("Done writing token to file");
             return true;
 
         } catch(Exception ex) {
@@ -65,7 +65,7 @@ public class AspectUtils{
             AuthToken token = (AuthToken) ois.readObject();
             ois.close();
 
-            System.out.println("Done reading");
+            System.out.println("Done reading token from disk");
             return token;
 
         } catch(Exception ex) {

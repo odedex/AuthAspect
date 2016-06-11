@@ -89,7 +89,7 @@ public class GoogleAuthAspect{
         if (_tokenHeld) {
             AspectUtils.finishedLogIn();
             try {
-                System.out.println("already logged in");
+//                System.out.println("already logged in");
                 point.proceed();
             } catch (Throwable t) {
                 System.err.println(t);
@@ -146,7 +146,7 @@ public class GoogleAuthAspect{
         browser.AddListener(new ChangeListener<Worker.State>() {
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                 if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-                    System.out.println("URL: " + browser.getLocation());
+//                    System.out.println("URL: " + browser.getLocation());
                     if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
                         String url = browser.getLocation();
                         Pattern p = Pattern.compile(".+state=(.+)&code=(.+)#.*");
