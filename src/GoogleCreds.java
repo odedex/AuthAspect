@@ -2,7 +2,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by Nadav on 31/05/2016.
+ * Annotation containing the API keys for a google authentication. Used by GoogleAuthAspect
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GoogleCreds {

@@ -4,21 +4,26 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 
 /**
- * Created by Oded on 09-Jun-16.
+ * Aspect to find the annotations containing the authentication services API keys
  */
-
 @Aspect
 public class CredentialsAspect {
 
     public  static Annotation[] annotations;
 
-
+    /**
+     * Pointcut for the execution of public static void main
+     */
     @Pointcut("execution(public static void main(String[]))")
     public void FacebookAuthPublicStaticVoidMainInvoke(){}
 
+    /**
+     * Before the execution of public static void main, parse out the name of the class containing the call
+     * and use reflection to get all annotations of that class.
+     * @param point JoinPoint
+     */
     @Before("FacebookAuthPublicStaticVoidMainInvoke()")
     public void BeforeFacebookAuthPublicStaticVoidMainInvoke(JoinPoint point) {
 

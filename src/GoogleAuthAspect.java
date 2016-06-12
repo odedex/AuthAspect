@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 
 import javax.swing.*;
 import java.lang.annotation.Annotation;
@@ -23,7 +22,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Nadav on 31/05/2016.
+ * Aspect to manage the user authentication of the users, managed by google.
+ * Requires the addition of a @GoogleCreds annotation before the main class of the program.
+ * Will validate authentication for every function having @GoogleAuth before its' declaration.
+ * Saves an existing token during the session.
+ * TODO: is this all? should we write something about friends list / photos?
  */
 @Aspect
 public class GoogleAuthAspect{
@@ -37,11 +40,24 @@ public class GoogleAuthAspect{
     static String secretState;
     static OAuth20Service service;
 
+    private static OAuth2AccessToken _userToken;
+    private static boolean _tokenHeld = false;
+
+    /**
+     * TODO: document this
+     * @param clinetId
+     * @param clientSecret
+     */
     public static void setKey(String clinetId, String clientSecret){
 
     }
 
-    public GoogleAuthAspect() throws ClassNotFoundException, Exception{
+    /**
+     * Constructor.
+     * Validates the existence of a @GoogleCreds annotation.
+     * @throws Exception if @GoogleCreds was not found
+     */
+    public GoogleAuthAspect() throws Exception{
 
         boolean googleCreds = false;
 
@@ -71,21 +87,25 @@ public class GoogleAuthAspect{
 
     }
 
-    private static OAuth2AccessToken _userToken;
-    private static boolean _tokenHeld = false;
-
-
-
+    /**
+     * Around an annonymous pointcut containing the execution of any function with the annotation @GoogleAuth
+     * validates the existence of a token. If no token is currently held, open a browser with google for the
+     * user to log into with the google accout.
+     * @param point ProceedingJoinPoint
+     */
     @Around("@annotation(GoogleAuth) && execution(* *(..))")
     public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-        OAuth2AccessToken authToken = null;
+        OAuth2AccessToken authToken;
+        // If no token is currently available, try reading one from the disk.
         if (!_tokenHeld) {
             authToken = AspectUtils.attemptingLogIn(AuthType.GOOGLE);
+            if (authToken != null) {
+                _userToken = authToken;
+                _tokenHeld = true;
+            }
         }
-        if (authToken != null) {
-            _userToken = authToken;
-            _tokenHeld = true;
-        }
+
+        // If a token was successfully read from the disk, let the advised function proceed uninterrupted.
         if (_tokenHeld) {
             AspectUtils.finishedLogIn();
             try {
@@ -94,7 +114,9 @@ public class GoogleAuthAspect{
             } catch (Throwable t) {
                 System.err.println(t);
             }
-        } else {
+        }
+        // If no token was found, open a browser to let the user log in.
+        else {
             staticPoint = point;
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -106,8 +128,9 @@ public class GoogleAuthAspect{
         }
     }
 
-        /*##########################################################################*/
-
+    /**
+     * Open a JFrame window containing the browser to let the user log in.
+     */
     private static void initAndShowGUI() {
         // This method is invoked on the EDT thread
         frame = new JFrame("Login Using Aspect");
@@ -117,6 +140,7 @@ public class GoogleAuthAspect{
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
+        // Add a custom window closing listener to tell the time-window aspect that the logging in process is done.
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -127,6 +151,7 @@ public class GoogleAuthAspect{
             }
         });
 
+        // Add the browser to the JFrame.
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -135,42 +160,37 @@ public class GoogleAuthAspect{
         });
     }
 
+    /**
+     * Create the browser scene and set it as the fxpanel's scene
+     * @param fxPanel
+     */
     private static void initFX(JFXPanel fxPanel) {
-        // This method is invoked on the JavaFX thread
         Scene scene = createScene();
         fxPanel.setScene(scene);
     }
 
+    /**
+     * Create a browser object and add a listener that parses a token out of the url.
+     * @return the created Scene
+     */
     private static Scene createScene() {
         Browser browser = new Browser();
         browser.AddListener(new ChangeListener<Worker.State>() {
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                 if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-//                    System.out.println("URL: " + browser.getLocation());
-                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
+                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { //TODO: what is this url?
                         String url = browser.getLocation();
                         Pattern p = Pattern.compile(".+state=(.+)&code=(.+)#.*");
                         Matcher m = p.matcher(url);
                         if (m.find()) {
                             String value = m.group(1);
                             String code = m.group(2);
-
-
                             // Trade the Request Token and Verfier for the Access Token
-//                            System.out.println("Trading the Request Token for an Access Token...");
                             _userToken = service.getAccessToken(code);
-//                            System.out.println("Got the Access Token!");
-//                            System.out.println("(if your curious it looks like this: " + _userToken + ", 'rawResponse'='" + _userToken.getRawResponse() + "')");
-
-//                            System.out.println("Refreshing the Access Token...");
-//                            accessToken = service.refreshAccessToken(accessToken.getRefreshToken());
-//                            System.out.println("Refreshed the Access Token!");
-//                            System.out.println("(if your curious it looks like this: " + accessToken
-//                                    + ", 'rawResponse'='" + accessToken.getRawResponse() + "')");
-//                            System.out.println();
-
-
                             _tokenHeld = true;
+
+                            // When the token is found, hide the browser frame, and call the utils function to let the
+                            // time-window aspects that the log in has finished. proceed the advised function.
                             try {
                                 frame.setVisible(false);
                                 AspectUtils.loggedIn(_userToken, AuthType.GOOGLE);

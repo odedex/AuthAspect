@@ -2,6 +2,9 @@ import com.github.scribejava.apis.FacebookApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.oauth.OAuthService;
 
+/**
+ * TODO: document this
+ */
 public class FacebookScribeAuthenticator {
 
     public static final String STATE = "state";

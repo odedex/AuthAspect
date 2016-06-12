@@ -1,5 +1,5 @@
 /**
- * Created by OdedA on 05-Jun-16.
+ * Enum class to represent each authentication service.
  */
 public enum AuthType {
     FACEBOOK("facebook"),
@@ -7,15 +7,20 @@ public enum AuthType {
 
     private String name;
 
+    /**
+     * constructor
+     * @param val
+     */
     AuthType(String val) {
         this.name = val;
     }
 
+    /**
+     * return the string value of the enum
+     * @return string
+     */
     public String getName() {
         return name;
     }
 
-//    public String toString() {
-//        return name;
-//    }
 }

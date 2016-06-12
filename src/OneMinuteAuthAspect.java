@@ -1,36 +1,43 @@
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 
 import java.util.Date;
 
 /**
- * Created by OdedA on 08-Jun-16.
+ * Aspect to read/write an authentication token from/to the disk.
+ * When read, this aspects validates the token was written no more than 1 minute ago.
  */
 @Aspect
 public class OneMinuteAuthAspect {
 
     private static boolean oneMinActivate;
 
+    /**
+     * Constructor.
+     */
     public OneMinuteAuthAspect() {
-//        System.out.println("in one minute auth ctor");
-
-//        System.out.println("=================================");
-//        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-//            System.out.println(ste);
-//        }
-//        System.out.println("=================================");
-
         oneMinActivate = false;
     }
 
+    /**
+     * Pointcut for the execution of AspectUtils.attemptingLogIn(). This pointcut triggers only
+     * if a private boolean member is true.
+     * @return true iff oneMinActivate is true
+     */
     @Pointcut("execution(* AspectUtils.attemptingLogIn(..)) && if()")
     public static boolean OneMinAuthSomeAspectAttemptingToLogInInvoke() {
         return oneMinActivate;
     }
 
+    /**
+     * Around the execution of AspectUtils.attemptingLogIn(), check if a token of the relevant authentication
+     * is already available on the disk, and check if the timestamp is no more than 1 minute old.
+     * If it is, return that token. Otherwise return null.
+     * @param point ProceedingJoinPoint
+     * @return OAuth2AccessToken if a valid one found. null otherwise.
+     */
     @Around("OneMinAuthSomeAspectAttemptingToLogInInvoke()")
     public OAuth2AccessToken getOneMinAuthFromDisk(ProceedingJoinPoint point) {
 
@@ -55,25 +62,21 @@ public class OneMinuteAuthAspect {
         return null;
     }
 
-//    @Pointcut ("execution(public static void main(String[]))")
-//    public void psvminvoke(){}
-//
-//    @Before("psvminvoke()")
-//    public void psvminvokeadvice(JoinPoint point) {
-//
-//        String psvmSignature = point.getStaticPart().getSignature().toString();
-//        String[] psvmSigArrayByDots = psvmSignature.split("\\.");
-//        String callingClass = psvmSigArrayByDots[psvmSigArrayByDots.length - 2];
-//        String[] callingClassArrayBySpaces = callingClass.split(" ");
-//        String classname = callingClassArrayBySpaces[callingClassArrayBySpaces.length - 1];
-//    }
-
-
+    /**
+     * Pointcut for the execution of AspectUtils.loggedIn(). This pointcut triggers only
+     * if a private boolean member is true.
+     * @return true iff oneMinActivate is true
+     */
     @Pointcut("execution(* AspectUtils.loggedIn(..)) && if()")
     public static boolean OneMinAuthSomeAspectLoggedInInvoke() {
         return oneMinActivate;
     }
 
+    /**
+     * After the execution of AspectUtils.loggedIn(), create a wrapper object for the valid token
+     * and write it to the disk.
+     * @param point JoinPoint
+     */
     @After("OneMinAuthSomeAspectLoggedInInvoke()")
     public void saveOneMinAuthToDisk(JoinPoint point) {
 
@@ -89,26 +92,33 @@ public class OneMinuteAuthAspect {
 
     }
 
-
-    @Before("@annotation(OneMinAuth) && execution(* *(..))")
+    /**
+     * Before an anonymous pointcut for the execution of any function with annotation @OneMinAuth and any auth
+     * annotation, set a local boolean member to true, effectively turning this aspect on.
+     */
+    @Before("@annotation(OneMinAuth) && (@annotation(FacebookAuth) || @annotation(GoogleAuth)) && execution(* *(..))")
     public void initOneMinAuthAspect() {
-        System.out.println("one minute auth is now used");
-//        System.out.println("=================================");
-//        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-//            System.out.println(ste);
-//        }
-//        System.out.println("=================================");
+//        System.out.println("one minute auth is now used");
         oneMinActivate = true;
     }
 
+    /**
+     * Pointcut for the execution of AspectUtils.finishedLogIn(). Pointcut triggers only if a private boolean
+     * is true.
+     * @return true iff oneMinActivate is true.
+     */
     @Pointcut("execution(* AspectUtils.finishedLogIn(..)) && if()")
     public static boolean OneMinAuthSomeAspectFinishedLoggingInInvoke() {
         return oneMinActivate;
     }
 
+    /**
+     * Before the execution of AspectUtils.finishedLogIn(), set the private member to false, effectively
+     * turning this aspect off.
+     */
     @Before("OneMinAuthSomeAspectFinishedLoggingInInvoke()")
     public void finishOneMinAuthAspect() {
-        System.out.println("one minute auth is no longer used");
+//        System.out.println("one minute auth is no longer used");
         oneMinActivate = false;
     }
 }

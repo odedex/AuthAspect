@@ -1,5 +1,5 @@
 /**
- * Created by Nadav on 31/05/2016.
+ * Annotation used as a joinpoint for GoogleAuthAspect
  */
 public @interface GoogleAuth {
 }

@@ -2,7 +2,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by OdedA on 30-May-16.
+ * Annotation containing the API keys for a facebook authentication. Used by FacebookAuthAspect
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FacebookCreds  {

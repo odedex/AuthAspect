@@ -4,19 +4,29 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by OdedA on 05-Jun-16.
+ * Wrapper class to represent a single authentication
  */
 public class AuthToken implements Serializable {
     public OAuth2AccessToken token;
     public AuthType type;
     public Date date;
 
+    /**
+     * constructor
+     * @param tok supplied by the authentication service (e.g. facebook)
+     * @param auth enum of the authentication type
+     */
     public AuthToken(OAuth2AccessToken tok, AuthType auth) {
         this.token = tok;
         this.type = auth;
         this.date = new Date();
     }
 
+    /**
+     * equals implementation
+     * @param other token to check
+     * @return tue iff other is equal to this token
+     */
     public boolean equals(Object other) {
         if (other instanceof AuthToken) {
             AuthToken o = (AuthToken) other;

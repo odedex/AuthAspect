@@ -27,7 +27,13 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 
-
+/**
+ * Aspect to manage the user authentication of the users, managed by facebook.
+ * Requires the addition of a @FacebookCreds annotation before the main class of the program.
+ * Will validate authentication for every function having @FacebookAuth before its' declaration.
+ * Saves an existing token during the session.
+ * TODO: is this all? should we write something about friends list / photos?
+ */
 @Aspect
 public class FacebookAuthAspect {
 
@@ -40,11 +46,19 @@ public class FacebookAuthAspect {
     static String secretState;
     static OAuth20Service service;
 
+    private static OAuth2AccessToken _userToken;
+    private static boolean _tokenHeld;
 
-    public FacebookAuthAspect() throws ClassNotFoundException, Exception{
+    /**
+     * Constructor.
+     * Validates the existence of a @FacebookCreds annotation.
+     * @throws Exception if @FacebookCreds was not found
+     */
+    public FacebookAuthAspect() throws Exception{
 
         boolean facebookCreds = false;
         String scope = "";
+        _tokenHeld = false;
 
         for(Annotation annotation : CredentialsAspect.annotations){
             if(annotation instanceof FacebookCreds){
@@ -67,38 +81,40 @@ public class FacebookAuthAspect {
                 .apiSecret(clientSecret)
                 .state(secretState)
                 .scope(scope)
-                .callback("http://www.rotenberg.co.il/oauth_callback/")
+                .callback("http://www.rotenberg.co.il/oauth_callback/") //TODO: what is this callback?
                 .build(FacebookApi.instance());
-
 
     }
 
-    private static OAuth2AccessToken _userToken;
-    private static boolean _tokenHeld = false;
-
-
-
+    /**
+     * Around an annonymous pointcut containing the execution of any function with the annotation @FacebookAuth
+     * validates the existence of a token. If no token is currently held, open a browser with facebook for the
+     * user to log into with the facebook accout.
+     * @param point ProceedingJoinPoint
+     */
     @Around("@annotation(FacebookAuth) && execution(* *(..))")
-    public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
-        OAuth2AccessToken authToken = null;
+    public void AroundFacebookAuthAnnotation(ProceedingJoinPoint point) {
+        OAuth2AccessToken authToken;
+        // If no token is currently available, try reading one from the disk.
         if (!_tokenHeld) {
             authToken = AspectUtils.attemptingLogIn(AuthType.FACEBOOK);
-//            System.out.println(authToken);
+            if (authToken != null) {
+                _userToken = authToken;
+                _tokenHeld = true;
+            }
         }
-        if (authToken != null) {
-            _userToken = authToken;
-            _tokenHeld = true;
-        }
+
+        // If a token was successfully read from the disk, let the advised function proceed uninterrupted.
         if (_tokenHeld) {
             AspectUtils.finishedLogIn();
             try {
-//                System.out.println("already logged in");
-//                AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
                 point.proceed();
             } catch (Throwable t) {
                 System.err.println(t);
             }
-        } else {
+        }
+        // If no token was found, open a browser to let the user log in.
+        else {
             staticPoint = point;
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -110,28 +126,31 @@ public class FacebookAuthAspect {
         }
     }
 
+    /**
+     * TODO: DOCUMENT THIS
+     * @param FacebookPrivateResource
+     */
     @Pointcut(value="@annotation(FacebookPrivateResource)")
-    protected void getPrvateResource(FacebookPrivateResource FacebookPrivateResource) {
+    protected void getPrivateResource(FacebookPrivateResource FacebookPrivateResource) {
     }
 
-    @Around("getPrvateResource(FacebookPrivateResource)")
+    /**
+     * TODO: DOCUMENT THIS
+     * @param FacebookPrivateResource
+     * @return
+     */
+    @Around("getPrivateResource(FacebookPrivateResource)")
     public String dowork(FacebookPrivateResource FacebookPrivateResource){
         final OAuthRequest request = new OAuthRequest(Verb.GET, FacebookPrivateResource.url(), service);
         service.signRequest(_userToken, request);
         final Response response = request.send();
-//        System.out.println("Got it! Lets see what we found...");
-//        System.out.println();
-//        System.out.println(response.getCode());
-//        System.out.println(response.getBody());
         return response.getBody();
 
     }
 
-
-
-        /*##########################################################################*/
-
-
+    /**
+     * Open a JFrame window containing the browser to let the user log in.
+     */
     private static void initAndShowGUI() {
         // This method is invoked on the EDT thread
         frame = new JFrame("Login Using Aspect");
@@ -141,16 +160,17 @@ public class FacebookAuthAspect {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
+        // Add a custom window closing listener to tell the time-window aspect that the logging in process is done.
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 
-                System.out.println("Browser window closed.");
                 frame.setVisible(false);
                 AspectUtils.finishedLogIn();
             }
         });
 
+        // Add the browser to the JFrame.
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -159,43 +179,51 @@ public class FacebookAuthAspect {
         });
     }
 
-
+    /**
+     * Create the browser scene and set it as the fxpanel's scene
+     * @param fxPanel
+     */
     private static void initFX(JFXPanel fxPanel) {
-        // This method is invoked on the JavaFX thread
         Scene scene = createScene();
         fxPanel.setScene(scene);
     }
 
+    /**
+     * Create a browser object and add a listener that parses a token out of the url.
+     * @return the created Scene
+     */
     private static Scene createScene() {
         Browser browser = new Browser();
         browser.AddListener(new ChangeListener<Worker.State>() {
-                                public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                                    if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-//                                        System.out.println("URL: " + browser.getLocation());
-                                        if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) {
-                                            String url = browser.getLocation();
-                                            Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
-                                            Matcher m = p.matcher(url);
-                                            if (m.find()) {
-                                                String code = m.group(1);
-                                                String value = m.group(2);
-                                                // Trade the Request Token and Verfier for the Access Token
-                                                _userToken = service.getAccessToken(code);
-                                                _tokenHeld = true;
-                                                try {
-                                                    frame.setVisible(false);
-                                                    AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
-                                                    AspectUtils.finishedLogIn();
-                                                    staticPoint.proceed();
-                                                } catch (Throwable t) {
-                                                    System.err.println(t);
-                                                }
-                                            }
+            public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
+                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { //TODO: what is this url?
+                        String url = browser.getLocation();
+                        Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
+                        Matcher m = p.matcher(url);
+                        if (m.find()) {
+                            String code = m.group(1);
+                            String value = m.group(2);
+                            // Trade the Request Token and Verfier for the Access Token
+                            _userToken = service.getAccessToken(code);
+                            _tokenHeld = true;
 
-                                        }
-                                    }
-                                }
-                            });
+                            // When the token is found, hide the browser frame, and call the utils function to let the
+                            // time-window aspects that the log in has finished. proceed the advised function.
+                            try {
+                                frame.setVisible(false);
+                                AspectUtils.loggedIn(_userToken, AuthType.FACEBOOK);
+                                AspectUtils.finishedLogIn();
+                                staticPoint.proceed();
+                            } catch (Throwable t) {
+                                System.err.println(t);
+                            }
+                        }
+
+                    }
+                }
+            }
+        });
 
 
         Scene scene = new Scene(browser,750,500, Color.web("#666970"));

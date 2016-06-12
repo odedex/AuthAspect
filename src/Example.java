@@ -22,6 +22,8 @@
 
 import java.util.logging.LogManager;
 
+//TODO: WHAT IS THIS? CAN WE DELETE THIS?
+
 /**
  * @author <a href="http://restfb.com">Mark Allen</a>
  */

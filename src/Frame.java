@@ -1,11 +1,3 @@
-/**
- * Created by OdedA on 03-May-16.
- */
-import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.model.OAuthRequest;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.aspectj.lang.annotation.Aspect;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -246,7 +238,6 @@ public class Frame extends JFrame {
 
 
     }
-
 
     private class AddButton implements ActionListener {
 

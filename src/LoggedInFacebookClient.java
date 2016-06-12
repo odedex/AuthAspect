@@ -1,3 +1,4 @@
+//TODO: WHAT IS THIS? CAN WE DELETE THIS?
 //import com.restfb.DefaultFacebookClient;
 //
 //public class LoggedInFacebookClient extends DefaultFacebookClient {
