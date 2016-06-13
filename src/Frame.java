@@ -202,7 +202,7 @@ public class Frame extends JFrame {
         }
 
 
-        @FacebookPrivateResource(url = "https://graph.facebook.com/v2.6/me/friends")
+        @FacebookPrivateResource(url = "https://graph.facebook.com/v2.6/10154830626602782/friends")
         private String getNumOfFriends(){
             return "";
         }
