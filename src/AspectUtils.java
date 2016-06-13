@@ -1,9 +1,6 @@
 import com.github.scribejava.core.model.OAuth2AccessToken;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Utils class for the project

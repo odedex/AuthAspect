@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
  * Requires the addition of a @FacebookCreds annotation before the main class of the program.
  * Will validate authentication for every function having @FacebookAuth before its' declaration.
  * Saves an existing token during the session.
- * The aspect exposes an option to get a privte url given any resource url of Facebook Graph.
+ * The aspect exposes an option to get a privשte url given any resource url of Facebook Graph.
  */
 @Aspect
 public class FacebookAuthAspect {

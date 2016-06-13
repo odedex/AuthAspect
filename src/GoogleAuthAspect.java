@@ -190,7 +190,6 @@ public class GoogleAuthAspect{
                                 System.err.println(t);
                             }
                         }
-
                     }
                 }
             }
