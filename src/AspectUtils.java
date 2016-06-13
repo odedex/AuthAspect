@@ -10,23 +10,7 @@ import java.util.Map;
  */
 public class AspectUtils{
 
-    public static String timeAspects[] = {"OneMinAuth", "PermanentAuth"};
-    public static String authAspects[] = {"FacebookAuth", "GoogleAuth"};
-
-    private static Map authKeys = new HashMap();
     private static String tokenFileName = "authToken";
-
-    /**
-     * TODO: document this
-     * @param type
-     * @return
-     */
-    public static OAuth2AccessToken getToken(AuthType type){
-        if (authKeys.containsKey(type)){
-            return (OAuth2AccessToken) authKeys.get(type);
-        }
-        return null;
-    }
 
     /**
      * Called upon successful log in's by authentication aspects.
@@ -35,7 +19,7 @@ public class AspectUtils{
      * @param authType enum of the authentication type
      */
     public static void loggedIn(OAuth2AccessToken token, AuthType authType) {
-        authKeys.put(authType, token);
+
     }
 
     /**

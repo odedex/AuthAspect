@@ -25,8 +25,7 @@ import java.util.regex.Pattern;
  * Aspect to manage the user authentication of the users, managed by google.
  * Requires the addition of a @GoogleCreds annotation before the main class of the program.
  * Will validate authentication for every function having @GoogleAuth before its' declaration.
- * Saves an existing token during the session.
- * TODO: is this all? should we write something about friends list / photos?
+ * Saves an existing token during the sessions
  */
 @Aspect
 public class GoogleAuthAspect{
@@ -42,15 +41,6 @@ public class GoogleAuthAspect{
 
     private static OAuth2AccessToken _userToken;
     private static boolean _tokenHeld = false;
-
-    /**
-     * TODO: document this
-     * @param clinetId
-     * @param clientSecret
-     */
-    public static void setKey(String clinetId, String clientSecret){
-
-    }
 
     /**
      * Constructor.
@@ -178,7 +168,7 @@ public class GoogleAuthAspect{
         browser.AddListener(new ChangeListener<Worker.State>() {
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                 if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { //TODO: what is this url?
+                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { // make sure we are in the right page
                         String url = browser.getLocation();
                         Pattern p = Pattern.compile(".+state=(.+)&code=(.+)#.*");
                         Matcher m = p.matcher(url);

@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
  * Requires the addition of a @FacebookCreds annotation before the main class of the program.
  * Will validate authentication for every function having @FacebookAuth before its' declaration.
  * Saves an existing token during the session.
- * TODO: is this all? should we write something about friends list / photos?
+ * The aspect exposes an option to get a privte url given any resource url of Facebook Graph.
  */
 @Aspect
 public class FacebookAuthAspect {
@@ -81,7 +81,7 @@ public class FacebookAuthAspect {
                 .apiSecret(clientSecret)
                 .state(secretState)
                 .scope(scope)
-                .callback("http://www.rotenberg.co.il/oauth_callback/") //TODO: what is this callback?
+                .callback("http://www.rotenberg.co.il/oauth_callback/") // callback of authorized website
                 .build(FacebookApi.instance());
 
     }
@@ -127,25 +127,28 @@ public class FacebookAuthAspect {
     }
 
     /**
-     * TODO: DOCUMENT THIS
-     * @param FacebookPrivateResource
+     * Used to wrap execution of methods who returns a resource from facebook
+     * @param FacebookPrivateResource the facebook graph url to acess
      */
     @Pointcut(value="@annotation(FacebookPrivateResource)")
     protected void getPrivateResource(FacebookPrivateResource FacebookPrivateResource) {
     }
 
     /**
-     * TODO: DOCUMENT THIS
-     * @param FacebookPrivateResource
+     * get the resource from facebook URL
+     * @param FacebookPrivateResource url to acccess
      * @return
      */
     @Around("getPrivateResource(FacebookPrivateResource)")
-    public String dowork(FacebookPrivateResource FacebookPrivateResource){
+    public String getResource(FacebookPrivateResource FacebookPrivateResource){
+        if (!_tokenHeld){
+            return "";
+        }
         final OAuthRequest request = new OAuthRequest(Verb.GET, FacebookPrivateResource.url(), service);
+        //use the service and the token given
         service.signRequest(_userToken, request);
         final Response response = request.send();
         return response.getBody();
-
     }
 
     /**
@@ -197,7 +200,7 @@ public class FacebookAuthAspect {
         browser.AddListener(new ChangeListener<Worker.State>() {
             public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                 if (newState == Worker.State.SUCCEEDED && !_tokenHeld) {
-                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { //TODO: what is this url?
+                    if (browser.getLocation().startsWith("http://www.rotenberg.co.il")) { // make sure we are the right page
                         String url = browser.getLocation();
                         Pattern p = Pattern.compile(".+code=(.+)&state=(.+)#.*");
                         Matcher m = p.matcher(url);
