@@ -73,7 +73,7 @@ public class GoogleAuthAspect{
 
         if (!googleCreds) {
             throw new Exception("Google credentials were not supplied\nPlease add " +
-                    "@FGoogleCreds(clientId = <clientID>, secret = <secret> before the program's main class");
+                    "@GoogleCreds(clientId = <clientID>, secret = <secret> before the program's main class");
         }
 
         secretState = "secret" + new Random().nextInt(999_999);
@@ -94,7 +94,7 @@ public class GoogleAuthAspect{
      * @param point ProceedingJoinPoint
      */
     @Around("@annotation(GoogleAuth) && execution(* *(..))")
-    public void aroundBasicAuthAnnot(ProceedingJoinPoint point) {
+    public void ArounGoogleAuthAnnotation(ProceedingJoinPoint point) {
         OAuth2AccessToken authToken;
         // If no token is currently available, try reading one from the disk.
         if (!_tokenHeld) {

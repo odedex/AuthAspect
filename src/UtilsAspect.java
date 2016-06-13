@@ -7,5 +7,6 @@ import org.aspectj.lang.annotation.DeclarePrecedence;
  */
 @Aspect
 @DeclarePrecedence("CredentialsAspect, OneMinuteAuthAspect, PermanentAuthAspect, FacebookAuthAspect, GoogleAuthAspect")
+
 public class UtilsAspect {
 }

@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 @Aspect
 public class CredentialsAspect {
 
-    public  static Annotation[] annotations;
+    public static Annotation[] annotations;
 
     /**
      * Pointcut for the execution of public static void main
@@ -19,11 +19,6 @@ public class CredentialsAspect {
     @Pointcut("execution(public static void main(String[]))")
     public void FacebookAuthPublicStaticVoidMainInvoke(){}
 
-    /**
-     * Before the execution of public static void main, parse out the name of the class containing the call
-     * and use reflection to get all annotations of that class.
-     * @param point JoinPoint
-     */
     @Before("FacebookAuthPublicStaticVoidMainInvoke()")
     public void BeforeFacebookAuthPublicStaticVoidMainInvoke(JoinPoint point) {
 

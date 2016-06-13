@@ -31,13 +31,7 @@ public class OneMinuteAuthAspect {
         return oneMinActivate;
     }
 
-    /**
-     * Around the execution of AspectUtils.attemptingLogIn(), check if a token of the relevant authentication
-     * is already available on the disk, and check if the timestamp is no more than 1 minute old.
-     * If it is, return that token. Otherwise return null.
-     * @param point ProceedingJoinPoint
-     * @return OAuth2AccessToken if a valid one found. null otherwise.
-     */
+
     @Around("OneMinAuthSomeAspectAttemptingToLogInInvoke()")
     public OAuth2AccessToken getOneMinAuthFromDisk(ProceedingJoinPoint point) {
 

@@ -153,10 +153,7 @@ public class Frame extends JFrame {
                 System.out.println("calculator encountered an error.");
                 System.out.println(ex);
             }
-
         }
-
-
     }
 
     private class CButton implements ActionListener {
